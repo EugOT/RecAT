@@ -111,6 +111,8 @@ flowchart LR
 
 ### Recursion
 
+> **Worked example:** [applications/recurse](applications/recurse/) · [README](applications/recurse/README.md)
+
 A recursive agent attempts a task, **self-reflects on how it could have done better**, reads its own source to find what to change, edits its own source, and runs again on the edited version. After enough runs, the source has been shaped into something that does the task on its own.
 
 For Claude Code, the source is `.claude/CLAUDE.md` and anything else under `.claude/`. A recursive run looks like:
@@ -150,9 +152,11 @@ The termination condition is what keeps the recursion finite. The three exits ar
 
 **This is how a `.claude/` is trained: by being run, observed, and rewritten until it does the task without being rewritten again.**
 
-[applications/recurse](applications/recurse/) demonstrates this with the source-of-record being a sibling file rather than `.claude/CLAUDE.md` itself, to keep the git history clean. See [applications/recurse/README.md](applications/recurse/README.md) for details.
+The worked example linked at the top of this section uses a sibling file as the source-of-record rather than `.claude/CLAUDE.md` itself, to keep the git history clean.
 
 ### Orchestrator
+
+> **Worked example:** [applications/orchestrator](applications/orchestrator/) · [README](applications/orchestrator/README.md)
 
 An orchestrator dispatches work to one or more **workers**, observes how they did, **reflects on what to change**, and edits the workers' instructions for the next round. The orchestrator never attempts the underlying task itself — its job is to *train the workers*, not to do the work. After enough rounds, the workers' instructions have been shaped into something that does the task on its own.
 
@@ -197,9 +201,9 @@ The most important constraint on the edit step is **generalization**. A fix must
 
 **This is how a fleet of `.claude/`s is trained: by being dispatched, scored, and rewritten until fresh workers satisfy the scorecard without further edits.**
 
-[applications/orchestrator](applications/orchestrator/) is the worked example.
-
 ### Amplify
+
+> **Worked example:** [applications/amplify](applications/amplify/) · [README](applications/amplify/README.md)
 
 A Turing machine has a fixed transition table — given state X and symbol Y, always do Z. The table is small enough to print on paper, which means you can prove things about it directly: for every input, the machine reaches the right output, and the proof holds on every run, forever. There's no ambiguity in what the machine will do.
 
