@@ -1,0 +1,51 @@
+{
+  "_notes": [
+    "Hidden function instances for recurse.",
+    "f(x) = ((a*x + b) ^ c) % m",
+    "",
+    "The parent agent has access to this file. The child copy in /tmp",
+    "does not — inputs/ is never copied across the boundary.",
+    "",
+    "This application is the trajectory-style ESTIMATION case of the",
+    "project's central claim: P(parent solves instance within K=max_iterations | initial program, instance)",
+    "is not closed-form. Each instance declares a predicted band; the",
+    "empirical pass rate over many trials should fall in that band.",
+    "",
+    "Each instance has:",
+    "  a, b, c, m       — hidden function parameters (parent reads, child never sees)",
+    "  predicted_p_solved — point prediction of P(solved within max_iterations)",
+    "  predicted_median_iterations — point prediction of the median iteration count",
+    "                                on the trials that solve",
+    "  difficulty       — qualitative bucket: easy | hard",
+    "",
+    "Predictions are calibrated against smoke runs and refined as more",
+    "trials accumulate. They are the 'predict in advance' half of the",
+    "claim; the aggregator (bin/aggregate.sh) computes the empirical",
+    "half from the per-trial verdicts in traces/."
+  ],
+  "instances": [
+    {
+      "id": "easy-1",
+      "a": 4, "b": 11, "c": 0, "m": 256,
+      "difficulty": "easy",
+      "predicted_p_solved": 0.85,
+      "predicted_median_iterations": 2
+    },
+    {
+      "id": "easy-2",
+      "a": 6, "b": 19, "c": 0, "m": 256,
+      "difficulty": "easy",
+      "predicted_p_solved": 0.85,
+      "predicted_median_iterations": 2
+    },
+    {
+      "id": "hard-1",
+      "a": 4, "b": 11, "c": 90, "m": 256,
+      "difficulty": "hard",
+      "predicted_p_solved": 0.50,
+      "predicted_median_iterations": 4
+    }
+  ],
+  "x_domain_max": 200,
+  "max_iterations": 6
+}

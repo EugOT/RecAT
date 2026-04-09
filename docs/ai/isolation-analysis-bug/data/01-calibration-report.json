@@ -1,0 +1,957 @@
+{
+  "verdict": "calibrated",
+  "model": "claude-haiku-4-5-20251001",
+  "target_low": 0.6,
+  "target_high": 0.9,
+  "total_probes": 110,
+  "wall_clock_s": 2301.695507287979,
+  "traces_dir": "/Users/adamsohn/Projects/agent-specification/applications/amplify/traces/calibrate-20260408-124726",
+  "calibrated_cell": 7,
+  "cells": [
+    {
+      "idx": 4,
+      "n": 5,
+      "k": 5,
+      "ci": [
+        0.5655085052479191,
+        1.0,
+        1.0
+      ],
+      "status": "candidate",
+      "history": [
+        {
+          "label": "muldiv-5x7//4",
+          "expression": "floor( (18562 * 4187548) / 8249 )",
+          "truth": 9422871,
+          "reported": 9422871,
+          "passed": true,
+          "elapsed_s": 22.64652395248413
+        },
+        {
+          "label": "muldiv-5x7//4",
+          "expression": "floor( (91834 * 6754814) / 3601 )",
+          "truth": 172263701,
+          "reported": 172263701,
+          "passed": true,
+          "elapsed_s": 27.10440707206726
+        },
+        {
+          "label": "muldiv-5x7//4",
+          "expression": "floor( (23634 * 3794803) / 9350 )",
+          "truth": 9592125,
+          "reported": 9592125,
+          "passed": true,
+          "elapsed_s": 38.731589794158936
+        },
+        {
+          "label": "muldiv-5x7//4",
+          "expression": "floor( (53124 * 4161278) / 9936 )",
+          "truth": 22248765,
+          "reported": 22248765,
+          "passed": true,
+          "elapsed_s": 39.7948579788208
+        },
+        {
+          "label": "muldiv-5x7//4",
+          "expression": "floor( (19639 * 2939829) / 2260 )",
+          "truth": 25546593,
+          "reported": 25546593,
+          "passed": true,
+          "elapsed_s": 77.84627985954285
+        }
+      ]
+    },
+    {
+      "idx": 5,
+      "n": 40,
+      "k": 38,
+      "ci": [
+        0.834958291820748,
+        0.95,
+        0.9861796228538989
+      ],
+      "status": "candidate",
+      "history": [
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (821936 * 3985233) / 11378 )",
+          "truth": 287889477,
+          "reported": 287889476,
+          "passed": false,
+          "elapsed_s": 31.163933753967285
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (464580 * 3417962) / 16275 )",
+          "truth": 97567851,
+          "reported": 97567851,
+          "passed": true,
+          "elapsed_s": 37.17966604232788
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (261145 * 2332114) / 58348 )",
+          "truth": 10437716,
+          "reported": 10437716,
+          "passed": true,
+          "elapsed_s": 38.766433000564575
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (465413 * 5380446) / 35181 )",
+          "truth": 71178463,
+          "reported": 71178463,
+          "passed": true,
+          "elapsed_s": 42.1332631111145
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (834664 * 3637252) / 44198 )",
+          "truth": 68688250,
+          "reported": 68688250,
+          "passed": true,
+          "elapsed_s": 47.8927948474884
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (989390 * 2409948) / 11961 )",
+          "truth": 199346079,
+          "reported": 199346079,
+          "passed": true,
+          "elapsed_s": 23.742452144622803
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (818930 * 3472186) / 82815 )",
+          "truth": 34335292,
+          "reported": 34335292,
+          "passed": true,
+          "elapsed_s": 31.405473947525024
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (343056 * 8377576) / 53506 )",
+          "truth": 53713185,
+          "reported": 53713185,
+          "passed": true,
+          "elapsed_s": 35.95493292808533
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (791739 * 8435959) / 48839 )",
+          "truth": 136757053,
+          "reported": 136761148,
+          "passed": false,
+          "elapsed_s": 65.00133609771729
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (816606 * 3372489) / 36739 )",
+          "truth": 74961070,
+          "reported": 74961070,
+          "passed": true,
+          "elapsed_s": 106.17408204078674
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (796068 * 4644861) / 70516 )",
+          "truth": 52436683,
+          "reported": 52436683,
+          "passed": true,
+          "elapsed_s": 29.787343978881836
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (920539 * 1498681) / 34876 )",
+          "truth": 39557125,
+          "reported": 39557125,
+          "passed": true,
+          "elapsed_s": 33.799317836761475
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (315957 * 8642211) / 66810 )",
+          "truth": 40870634,
+          "reported": 40870634,
+          "passed": true,
+          "elapsed_s": 37.000943183898926
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (967348 * 9172309) / 84937 )",
+          "truth": 104463481,
+          "reported": 104463481,
+          "passed": true,
+          "elapsed_s": 41.40847587585449
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (129548 * 6788604) / 95689 )",
+          "truth": 9190712,
+          "reported": 9190712,
+          "passed": true,
+          "elapsed_s": 44.44856286048889
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (181305 * 8156411) / 90000 )",
+          "truth": 16431089,
+          "reported": 16431089,
+          "passed": true,
+          "elapsed_s": 25.389981985092163
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (697346 * 1119900) / 32084 )",
+          "truth": 24341035,
+          "reported": 24341035,
+          "passed": true,
+          "elapsed_s": 25.976070165634155
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (291999 * 4459614) / 72167 )",
+          "truth": 18044297,
+          "reported": 18044297,
+          "passed": true,
+          "elapsed_s": 28.258112907409668
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (632951 * 1178252) / 25704 )",
+          "truth": 29013997,
+          "reported": 29013997,
+          "passed": true,
+          "elapsed_s": 34.68700408935547
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (282693 * 9776386) / 52265 )",
+          "truth": 52878903,
+          "reported": 52878903,
+          "passed": true,
+          "elapsed_s": 40.79140496253967
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (130509 * 6009527) / 96241 )",
+          "truth": 8149306,
+          "reported": 8149306,
+          "passed": true,
+          "elapsed_s": 28.41976308822632
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (217045 * 4020657) / 39925 )",
+          "truth": 21857570,
+          "reported": 21857570,
+          "passed": true,
+          "elapsed_s": 34.67288112640381
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (490915 * 6944107) / 86848 )",
+          "truth": 39252098,
+          "reported": 39252098,
+          "passed": true,
+          "elapsed_s": 40.402754068374634
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (235226 * 9172458) / 58467 )",
+          "truth": 36902878,
+          "reported": 36902878,
+          "passed": true,
+          "elapsed_s": 47.38116097450256
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (847240 * 2567734) / 84845 )",
+          "truth": 25640720,
+          "reported": 25640720,
+          "passed": true,
+          "elapsed_s": 60.02036190032959
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (728252 * 3414216) / 50841 )",
+          "truth": 48905600,
+          "reported": 48905600,
+          "passed": true,
+          "elapsed_s": 25.87200093269348
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (398180 * 8319956) / 93460 )",
+          "truth": 35446609,
+          "reported": 35446609,
+          "passed": true,
+          "elapsed_s": 31.35062599182129
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (487280 * 8089195) / 13625 )",
+          "truth": 289299298,
+          "reported": 289299298,
+          "passed": true,
+          "elapsed_s": 44.526079177856445
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (111984 * 2966092) / 72608 )",
+          "truth": 4574631,
+          "reported": 4574631,
+          "passed": true,
+          "elapsed_s": 44.70021414756775
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (924115 * 5167966) / 60268 )",
+          "truth": 79242631,
+          "reported": 79242631,
+          "passed": true,
+          "elapsed_s": 100.08250689506531
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (241044 * 6717246) / 28618 )",
+          "truth": 56578092,
+          "reported": 56578092,
+          "passed": true,
+          "elapsed_s": 31.644795179367065
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (226121 * 3353174) / 10997 )",
+          "truth": 68948172,
+          "reported": 68948172,
+          "passed": true,
+          "elapsed_s": 36.10741925239563
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (690422 * 5927184) / 87016 )",
+          "truth": 47028801,
+          "reported": 47028801,
+          "passed": true,
+          "elapsed_s": 40.77323579788208
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (395180 * 8442304) / 53193 )",
+          "truth": 62719337,
+          "reported": 62719337,
+          "passed": true,
+          "elapsed_s": 79.9717960357666
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (673278 * 6590707) / 30397 )",
+          "truth": 145980788,
+          "reported": 145980788,
+          "passed": true,
+          "elapsed_s": 101.45546698570251
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (876083 * 2675466) / 39141 )",
+          "truth": 59884271,
+          "reported": 59884271,
+          "passed": true,
+          "elapsed_s": 32.139328956604004
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (758097 * 1028794) / 72878 )",
+          "truth": 10701798,
+          "reported": 10701798,
+          "passed": true,
+          "elapsed_s": 34.94843792915344
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (549805 * 2591414) / 95015 )",
+          "truth": 14995236,
+          "reported": 14995236,
+          "passed": true,
+          "elapsed_s": 37.20913624763489
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (822060 * 6408976) / 69894 )",
+          "truth": 75379328,
+          "reported": 75379328,
+          "passed": true,
+          "elapsed_s": 60.04227113723755
+        },
+        {
+          "label": "muldiv-6x7//5",
+          "expression": "floor( (472437 * 3255458) / 51852 )",
+          "truth": 29661320,
+          "reported": 29661320,
+          "passed": true,
+          "elapsed_s": 69.51555871963501
+        }
+      ]
+    },
+    {
+      "idx": 6,
+      "n": 10,
+      "k": 9,
+      "ci": [
+        0.5958436145024278,
+        0.9,
+        0.9821242504842788
+      ],
+      "status": "candidate",
+      "history": [
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (9203164 * 6216920) / 90079 )",
+          "truth": 635168400,
+          "reported": 635168400,
+          "passed": true,
+          "elapsed_s": 23.681631088256836
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (1472005 * 4788417) / 55046 )",
+          "truth": 128048791,
+          "reported": 128048791,
+          "passed": true,
+          "elapsed_s": 30.914631366729736
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (6038234 * 7422889) / 65705 )",
+          "truth": 682157229,
+          "reported": 682157229,
+          "passed": true,
+          "elapsed_s": 32.53056001663208
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (3633076 * 9456564) / 38658 )",
+          "truth": 888727189,
+          "reported": 888711669,
+          "passed": false,
+          "elapsed_s": 37.09513592720032
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (6480183 * 8562947) / 81517 )",
+          "truth": 680710325,
+          "reported": 680710325,
+          "passed": true,
+          "elapsed_s": 37.928797006607056
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (3356250 * 5280668) / 69308 )",
+          "truth": 255717117,
+          "reported": 255717117,
+          "passed": true,
+          "elapsed_s": 30.652424097061157
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (1136043 * 3540442) / 42965 )",
+          "truth": 93613274,
+          "reported": 93613274,
+          "passed": true,
+          "elapsed_s": 31.02443814277649
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (8267445 * 3745800) / 38369 )",
+          "truth": 807115001,
+          "reported": 807115001,
+          "passed": true,
+          "elapsed_s": 53.18435597419739
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (5954965 * 9746664) / 32654 )",
+          "truth": 1777455839,
+          "reported": 1777455839,
+          "passed": true,
+          "elapsed_s": 54.81855607032776
+        },
+        {
+          "label": "muldiv-7x7//5",
+          "expression": "floor( (7570937 * 3072404) / 95420 )",
+          "truth": 243774650,
+          "reported": 243774650,
+          "passed": true,
+          "elapsed_s": 90.94643115997314
+        }
+      ]
+    },
+    {
+      "idx": 7,
+      "n": 50,
+      "k": 37,
+      "ci": [
+        0.6044657801100008,
+        0.74,
+        0.8412862034863262
+      ],
+      "status": "decided-in-window",
+      "history": [
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (34017824 * 36794044) / 247103 )",
+          "truth": 5065310065,
+          "reported": 5065310065,
+          "passed": true,
+          "elapsed_s": 33.02698588371277
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (83738296 * 35300058) / 911434 )",
+          "truth": 3243204341,
+          "reported": 3243204341,
+          "passed": true,
+          "elapsed_s": 53.65365219116211
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (64012643 * 28915123) / 834561 )",
+          "truth": 2217852794,
+          "reported": 2217852794,
+          "passed": true,
+          "elapsed_s": 60.860477924346924
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (49756852 * 70273927) / 273014 )",
+          "truth": 12807436194,
+          "reported": 12807289681,
+          "passed": false,
+          "elapsed_s": 99.53119492530823
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (13897758 * 93490786) / 284561 )",
+          "truth": 4566023872,
+          "reported": 4566023872,
+          "passed": true,
+          "elapsed_s": 103.60998606681824
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (91983372 * 22295461) / 231620 )",
+          "truth": 8854208112,
+          "reported": 8854208112,
+          "passed": true,
+          "elapsed_s": 33.571434020996094
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (34478852 * 20882405) / 294925 )",
+          "truth": 2441303217,
+          "reported": 2441303217,
+          "passed": true,
+          "elapsed_s": 39.11980891227722
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (36353610 * 27123430) / 980507 )",
+          "truth": 1005637487,
+          "reported": 1005637477,
+          "passed": false,
+          "elapsed_s": 45.47376108169556
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (21183353 * 82780994) / 361688 )",
+          "truth": 4848319594,
+          "reported": 4851084,
+          "passed": false,
+          "elapsed_s": 76.62533688545227
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (36206539 * 76219173) / 898450 )",
+          "truth": 3071548177,
+          "reported": 3071548177,
+          "passed": true,
+          "elapsed_s": 108.56603407859802
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (61606101 * 63794596) / 792195 )",
+          "truth": 4961071862,
+          "reported": 4961071863,
+          "passed": false,
+          "elapsed_s": 33.55409502983093
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (25609469 * 94927887) / 802153 )",
+          "truth": 3030659711,
+          "reported": 3030659711,
+          "passed": true,
+          "elapsed_s": 36.02477312088013
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (60525610 * 69578907) / 814783 )",
+          "truth": 5168622552,
+          "reported": 5168622552,
+          "passed": true,
+          "elapsed_s": 68.2416262626648
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (28238713 * 51611919) / 459389 )",
+          "truth": 3172592656,
+          "reported": 3172592656,
+          "passed": true,
+          "elapsed_s": 88.7182240486145
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (78763158 * 51165608) / 727288 )",
+          "truth": 5541085329,
+          "reported": 5540901053909,
+          "passed": false,
+          "elapsed_s": 144.37847924232483
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (82864886 * 16468910) / 358446 )",
+          "truth": 3807252277,
+          "reported": 3807252277,
+          "passed": true,
+          "elapsed_s": 44.25688600540161
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (48338023 * 97092905) / 842733 )",
+          "truth": 5569117472,
+          "reported": 5569117472,
+          "passed": true,
+          "elapsed_s": 59.36289119720459
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (86110537 * 34742518) / 253008 )",
+          "truth": 11824514962,
+          "reported": 11824514962,
+          "passed": true,
+          "elapsed_s": 73.685302734375
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (24931463 * 15821815) / 848745 )",
+          "truth": 464757960,
+          "reported": 464757960,
+          "passed": true,
+          "elapsed_s": 83.2705008983612
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (86109964 * 91867065) / 763175 )",
+          "truth": 10365472742,
+          "reported": 10426532447,
+          "passed": false,
+          "elapsed_s": 134.23165106773376
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (98171970 * 41033512) / 520481 )",
+          "truth": 7739649879,
+          "reported": 7788649649,
+          "passed": false,
+          "elapsed_s": 42.99957823753357
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (32465292 * 64478588) / 319484 )",
+          "truth": 6552178472,
+          "reported": 6552178472,
+          "passed": true,
+          "elapsed_s": 61.20962405204773
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (86431264 * 35406081) / 328814 )",
+          "truth": 9306758027,
+          "reported": 9306758027,
+          "passed": true,
+          "elapsed_s": 69.98213815689087
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (86646795 * 63677193) / 665625 )",
+          "truth": 8289088733,
+          "reported": 8289090237,
+          "passed": false,
+          "elapsed_s": 80.57059621810913
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (88821818 * 44910403) / 513928 )",
+          "truth": 7761833645,
+          "reported": 7761833645,
+          "passed": true,
+          "elapsed_s": 346.4740219116211
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (33541820 * 65893883) / 898426 )",
+          "truth": 2460081033,
+          "reported": 2460081033,
+          "passed": true,
+          "elapsed_s": 46.4588348865509
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (69687774 * 95500680) / 638299 )",
+          "truth": 10426508273,
+          "reported": 10426508273,
+          "passed": true,
+          "elapsed_s": 49.57405996322632
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (90399514 * 85661996) / 479631 )",
+          "truth": 16145334239,
+          "reported": 16145334239,
+          "passed": true,
+          "elapsed_s": 52.746437072753906
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (85909088 * 14583588) / 212943 )",
+          "truth": 5883559191,
+          "reported": 5883559191,
+          "passed": true,
+          "elapsed_s": 71.2183051109314
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (25563548 * 98957112) / 433408 )",
+          "truth": 5836751704,
+          "reported": 5836751704,
+          "passed": true,
+          "elapsed_s": 102.7552421092987
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (72387844 * 45368352) / 579486 )",
+          "truth": 5667293406,
+          "reported": 5667293406,
+          "passed": true,
+          "elapsed_s": 59.194478034973145
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (60764084 * 28681404) / 622081 )",
+          "truth": 2801563207,
+          "reported": 2801563207,
+          "passed": true,
+          "elapsed_s": 76.08501720428467
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (64643541 * 94046778) / 458757 )",
+          "truth": 13252150374,
+          "reported": 13252150374,
+          "passed": true,
+          "elapsed_s": 92.46481466293335
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (61775127 * 64101647) / 305043 )",
+          "truth": 12981407160,
+          "reported": 12960014850051,
+          "passed": false,
+          "elapsed_s": 121.52305626869202
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (59080711 * 53741899) / 707479 )",
+          "truth": 4487920635,
+          "reported": 4487920635,
+          "passed": true,
+          "elapsed_s": 134.85407519340515
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (84538772 * 79615688) / 657492 )",
+          "truth": 10236797551,
+          "reported": 10236797551,
+          "passed": true,
+          "elapsed_s": 38.74376177787781
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (26736198 * 72627512) / 941687 )",
+          "truth": 2062026491,
+          "reported": 2062026491,
+          "passed": true,
+          "elapsed_s": 50.952324867248535
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (56832973 * 76040063) / 563449 )",
+          "truth": 7669874021,
+          "reported": 7669874021,
+          "passed": true,
+          "elapsed_s": 58.14160108566284
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (36384966 * 20939572) / 863557 )",
+          "truth": 882264419,
+          "reported": 882264419,
+          "passed": true,
+          "elapsed_s": 65.89399003982544
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (21133100 * 75466226) / 554542 )",
+          "truth": 2875950425,
+          "reported": 2875950777,
+          "passed": false,
+          "elapsed_s": 104.64451575279236
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (24542282 * 13733692) / 847657 )",
+          "truth": 397632700,
+          "reported": 397632700,
+          "passed": true,
+          "elapsed_s": 46.02301812171936
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (47374534 * 30052868) / 380693 )",
+          "truth": 3739865500,
+          "reported": 3739865500,
+          "passed": true,
+          "elapsed_s": 58.73846197128296
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (28784423 * 92354803) / 129660 )",
+          "truth": 20502697174,
+          "reported": 20502697172,
+          "passed": false,
+          "elapsed_s": 77.40612602233887
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (67661224 * 38136683) / 418926 )",
+          "truth": 6159499890,
+          "reported": 6159499794,
+          "passed": false,
+          "elapsed_s": 106.75709700584412
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (80290289 * 20729752) / 277338 )",
+          "truth": 6001333315,
+          "reported": 6001333315,
+          "passed": true,
+          "elapsed_s": 145.78289198875427
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (99101835 * 91024415) / 768741 )",
+          "truth": 11734363792,
+          "reported": 11734363792,
+          "passed": true,
+          "elapsed_s": 68.08569097518921
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (15596960 * 73370338) / 558277 )",
+          "truth": 2049796475,
+          "reported": 2049796475,
+          "passed": true,
+          "elapsed_s": 71.68084001541138
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (71857847 * 35879855) / 647943 )",
+          "truth": 3979129539,
+          "reported": 3979129539,
+          "passed": true,
+          "elapsed_s": 81.49587082862854
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (32813486 * 33913294) / 225519 )",
+          "truth": 4934455180,
+          "reported": 4934455180,
+          "passed": true,
+          "elapsed_s": 103.59681630134583
+        },
+        {
+          "label": "muldiv-8x8//6",
+          "expression": "floor( (81099317 * 34644296) / 468187 )",
+          "truth": 6001082352,
+          "reported": 6001082350,
+          "passed": false,
+          "elapsed_s": 130.3812699317932
+        }
+      ]
+    },
+    {
+      "idx": 8,
+      "n": 5,
+      "k": 4,
+      "ci": [
+        0.3755282641185388,
+        0.8,
+        0.9637768390302125
+      ],
+      "status": "candidate",
+      "history": [
+        {
+          "label": "twomul-(6x6+6x6)//5",
+          "expression": "floor( (573208 * 447603 + 248147 * 805655) / 87525 )",
+          "truth": 5215544,
+          "reported": 5215544,
+          "passed": true,
+          "elapsed_s": 32.83329892158508
+        },
+        {
+          "label": "twomul-(6x6+6x6)//5",
+          "expression": "floor( (526304 * 216659 + 339670 * 555494) / 67845 )",
+          "truth": 4461834,
+          "reported": 4461834,
+          "passed": true,
+          "elapsed_s": 39.16674089431763
+        },
+        {
+          "label": "twomul-(6x6+6x6)//5",
+          "expression": "floor( (580657 * 724783 + 793578 * 466941) / 70320 )",
+          "truth": 11254329,
+          "reported": 11254329,
+          "passed": true,
+          "elapsed_s": 46.734639167785645
+        },
+        {
+          "label": "twomul-(6x6+6x6)//5",
+          "expression": "floor( (388151 * 249727 + 381764 * 706706) / 16371 )",
+          "truth": 22400995,
+          "reported": 22400995,
+          "passed": true,
+          "elapsed_s": 50.12360715866089
+        },
+        {
+          "label": "twomul-(6x6+6x6)//5",
+          "expression": "floor( (828244 * 429776 + 144288 * 455827) / 17950 )",
+          "truth": 23494694,
+          "reported": 23494,
+          "passed": false,
+          "elapsed_s": 68.85908699035645
+        }
+      ]
+    }
+  ]
+}

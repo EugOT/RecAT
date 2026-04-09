@@ -1,0 +1,119 @@
+{
+  "_notes": [
+    "Test matrix for the amplify program — Pass 1 (calibration).",
+    "",
+    "The point of Pass 1 is to find a multiplication-difficulty rung where Claude's per-attempt success rate `p` lands in the 0.55-0.85 window. The harness fires `trials_per_problem_default` fresh sub-agents at each problem. The verifier accepts or rejects each trace by comparing the agent's reported answer against the deterministic Python ground truth. The aggregator (verify/trace_verify_all.sh) groups results by rung and reports per-rung pass rates. The smallest rung whose pass rate falls inside the target window is the input set for Pass 2.",
+    "",
+    "Rung difficulty climbs by digit count. Each rung has multiple distinct problems so we can average out problem-specific quirks (one easy problem on a hard rung would skew p upward).",
+    "",
+    "Problems were chosen to avoid commonly-memorized facts and to land in numerical ranges where rote pattern-matching is unlikely. None of these are powers of 10, none have small factors that simplify the computation, and none appear in standard multiplication tables.",
+    "",
+    "The ground truth is NOT stored in this file. The verifier computes it via `python3 -c 'print(a*b)'` so the file cannot drift from truth. This also means: do not edit the verifier to read ground truth from this file.",
+    "",
+    "rung 4 contains the user's worked example (2929 x 39393 = 115382097). At least one Claude session in the wild has been observed to return 115413897 for this problem, which is wrong by exactly 31800 — empirical evidence that p < 1 at this rung."
+  ],
+  "rungs": [
+    {
+      "rung": 0,
+      "label": "2x2",
+      "problems": [
+        {"a": 47, "b": 83},
+        {"a": 38, "b": 92},
+        {"a": 56, "b": 71}
+      ]
+    },
+    {
+      "rung": 1,
+      "label": "3x3",
+      "problems": [
+        {"a": 234, "b": 567},
+        {"a": 318, "b": 472},
+        {"a": 481, "b": 256}
+      ]
+    },
+    {
+      "rung": 2,
+      "label": "4x3",
+      "problems": [
+        {"a": 2929, "b": 393},
+        {"a": 4716, "b": 287},
+        {"a": 6824, "b": 195}
+      ]
+    },
+    {
+      "rung": 3,
+      "label": "4x4",
+      "problems": [
+        {"a": 2929, "b": 3939},
+        {"a": 4716, "b": 5837},
+        {"a": 6824, "b": 1953}
+      ]
+    },
+    {
+      "rung": 4,
+      "label": "4x5",
+      "problems": [
+        {"a": 2929, "b": 39393},
+        {"a": 4716, "b": 58372},
+        {"a": 6824, "b": 19537}
+      ]
+    },
+    {
+      "rung": 5,
+      "label": "5x5",
+      "problems": [
+        {"a": 12345, "b": 67890},
+        {"a": 24681, "b": 13579},
+        {"a": 38462, "b": 95173}
+      ]
+    },
+    {
+      "rung": 6,
+      "label": "6x6",
+      "problems": [
+        {"a": 374829, "b": 615384},
+        {"a": 923847, "b": 158293},
+        {"a": 286174, "b": 739518}
+      ]
+    },
+    {
+      "rung": 7,
+      "label": "7x7",
+      "problems": [
+        {"a": 4829374, "b": 1582937},
+        {"a": 7193847, "b": 2845619},
+        {"a": 5836274, "b": 1947382}
+      ]
+    },
+    {
+      "rung": 8,
+      "label": "8x8",
+      "problems": [
+        {"a": 48293745, "b": 91827364},
+        {"a": 71938472, "b": 28456193},
+        {"a": 36584729, "b": 84629173}
+      ]
+    },
+    {
+      "rung": 9,
+      "label": "9x9",
+      "problems": [
+        {"a": 482937451, "b": 918273645},
+        {"a": 719384726, "b": 284561937},
+        {"a": 384725619, "b": 627384195}
+      ]
+    },
+    {
+      "rung": 10,
+      "label": "10x10",
+      "problems": [
+        {"a": 4829374518, "b": 9182736459},
+        {"a": 7193847263, "b": 2845619374},
+        {"a": 5849273618, "b": 6385729184}
+      ]
+    }
+  ],
+  "trials_per_problem_default": 5,
+  "target_p_low": 0.55,
+  "target_p_high": 0.85
+}

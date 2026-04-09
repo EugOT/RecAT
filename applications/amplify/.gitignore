@@ -1,0 +1,15 @@
+traces/*.jsonl
+traces/*.txt
+traces/*.json
+traces/*.log
+traces/.run-*
+traces/calibrate-*
+!traces/.gitkeep
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Per-app virtualenv (matplotlib for chart generation)
+.venv/

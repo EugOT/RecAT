@@ -1,0 +1,5 @@
+{
+  "_comment": "The amplify experiment measures how often the model alone produces a correct multiplication. The child agent must therefore not delegate the multiplication to a calculator. The rule is enforced primarily in .claude/rules/arithmetic.md and verified by trace_verify.py (which compares the agent's reported answer against the deterministic ground truth). A future hardening pass could add a PreToolUse hook on Bash that pattern-matches and rejects any subprocess that looks like an arithmetic shortcut for the target multiplication. Hooks intentionally empty for the bootstrap.",
+  "autoMemoryEnabled": false,
+  "hooks": {}
+}

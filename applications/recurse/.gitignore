@@ -1,0 +1,11 @@
+traces/iterations/iter-*.md
+traces/iterations/setup.md
+traces/*.jsonl
+traces/*.txt
+traces/*.md
+!traces/.gitkeep
+!traces/iterations/.gitkeep
+state/agent-program.md
+__pycache__/
+*.pyc
+.venv/

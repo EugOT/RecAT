@@ -1,0 +1,6 @@
+{
+  "autoMemoryEnabled": false,
+  "permissions": {
+    "allow": ["Bash", "Read", "Write", "Edit"]
+  }
+}

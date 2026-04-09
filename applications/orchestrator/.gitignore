@@ -1,0 +1,7 @@
+traces/*.jsonl
+traces/*.txt
+traces/*.md
+!traces/.gitkeep
+__pycache__/
+*.pyc
+.venv/

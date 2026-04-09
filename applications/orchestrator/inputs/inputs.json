@@ -1,0 +1,21 @@
+{
+  "_notes": [
+    "Test cases for orchestrator.",
+    "",
+    "For each integer N in test_cases, the student must output a single line of the form DIGIT_SUM=<S>;CHECK=<H>, where S is the decimal digit sum of N and H is the first 8 lowercase hex characters of sha256(f'{N}-{S}').hexdigest(). The verifier hard-checks the line against the regex ^DIGIT_SUM=(\\d+);CHECK=([0-9a-f]{8})$ and independently recomputes both S and H.",
+    "",
+    "The CHECK component is the load-bearing iteration-forcer: it is mathematically impossible for any language model to produce a correct 8-char SHA-256 prefix mentally, so the student MUST invoke python3 via Bash to produce a passing CHECK. Without that, every attempt fails on CHECK regardless of how clever the model is.",
+    "",
+    "The mix [12, 99, 12345] is deliberately small: digit sums are trivial mental arithmetic, so the only failure mode that matters is the CHECK component. This isolates the experiment to 'can the tutor teach the student to use Bash for hashing'.",
+    "",
+    "max_rounds is the budget for the tutor-student loop. 6 is enough for the typical 2–3 round convergence on this task.",
+    "",
+    "convergence_threshold is the pass rate the student must hit for the loop to terminate as 'converged'. 1.0 means every test case must pass. Lower it (e.g., 0.8) for partial-credit experiments.",
+    "",
+    "trials_per_run_default is the number of independent tutor-student loops to run. Each trial starts with the same initial student and runs until convergence or max_rounds; trials are independent draws from the trajectory-style P(converges within K rounds | initial student, test suite)."
+  ],
+  "test_cases": [12, 99, 12345],
+  "max_rounds": 6,
+  "convergence_threshold": 1.0,
+  "trials_per_run_default": 1
+}
