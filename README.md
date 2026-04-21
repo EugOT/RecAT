@@ -201,6 +201,10 @@ The most important constraint on the edit step is **generalization**. A fix must
 
 **This is how a fleet of `.claude/`s is trained: by being dispatched, scored, and rewritten until fresh workers satisfy the scorecard without further edits.**
 
+### Reliability Testing
+
+I worked on testing experiments on AI agent reliability, which are detailed in [Reliably Incorrect: An exploration of AI agent reliability through data visualization](https://adamsohn.com/reliably-incorrect/). These experiments explore how language models fail in structured and predictable ways when performing multi-step reasoning tasks. By analyzing model behavior across varying difficulty levels, the research introduces a formula for reliability ($P(success) = p_{step}^N$), demonstrating how per-step errors compound exponentially. The findings reveal that self-verification often fails to catch errors because it relies on the same error-prone generation process, and that models exhibit distinct behaviors—such as grinding endlessly or quitting quickly—when pushed beyond their capabilities. This quantitative approach to measuring step accuracy provides the reliable evaluation signal needed to tune agents and measure iterations.
+
 ### Amplify
 
 > **Worked example:** [applications/amplify](applications/amplify/) · [README](applications/amplify/README.md)
