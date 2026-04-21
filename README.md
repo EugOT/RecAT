@@ -2,6 +2,11 @@
 
 > An attempt to understand `.claude/` directories as a **program** whose expected-outcome probability is computable — and therefore tunable by recursion.
 
+## Table of Contents
+- [Recursion](#recursion)
+- [Orchestrator](#orchestrator)
+- [Amplify](#amplify)
+
 ## Prerequisite
 
 This is not a tutorial on Claude Code. It assumes you've used it. If you haven't, [Components of a Coding Agent](https://magazine.sebastianraschka.com/p/components-of-a-coding-agent) is the best deep dive I know of.
