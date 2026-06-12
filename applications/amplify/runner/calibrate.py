@@ -213,6 +213,11 @@ class ProbeResult:
     outcome: str = "unknown"
     policy_violation: bool = False
 
+    @property
+    def counts_toward_estimate(self) -> bool:
+        """Whether this result is a model sample, not a harness failure."""
+        return self.outcome in MEASURED_OUTCOMES
+
 
 def extract_final_int(conv_path: Path) -> Optional[int]:
     """Extract the last large integer from the assistant's final text message."""
@@ -313,6 +318,8 @@ FORBIDDEN_NO_TOOL_NAMES = {
     "Edit",
     "Write",
 }
+
+MEASURED_OUTCOMES = {"model_correct", "model_wrong", "malformed"}
 
 
 def build_no_tool_claude_cmd(
@@ -491,6 +498,8 @@ class CellState:
 
     def update(self, result: ProbeResult) -> None:
         self.history.append(result)
+        if not result.counts_toward_estimate:
+            return
         self.n += 1
         if result.passed:
             self.k += 1
@@ -872,6 +881,14 @@ def run_calibration(args: argparse.Namespace) -> int:
                 result = fut.result()
                 cell.update(result)
                 total_probes += 1
+                if not result.counts_toward_estimate:
+                    print(
+                        f"  ! cell {next_idx} {result.label} excluded from p-hat "
+                        f"outcome={result.outcome} returncode={result.returncode} "
+                        f"policy_violation={result.policy_violation} see={result.err_path}",
+                        file=sys.stderr,
+                    )
+                    continue
                 lo, ph, hi = cell.ci()
                 marker = "✓" if result.passed else "✗"
                 print(

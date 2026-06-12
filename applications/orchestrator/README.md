@@ -124,7 +124,7 @@ For one trial (`trial-001`), the `traces/` directory contains:
 - `trial-001.tutor-r{round}.conversation.jsonl` and `.agent-stderr.txt` — same for each tutor invocation.
 - `trial-001.final-student.md` — forensic dump of the final patched student instructions, written once at the end of the trial. Write-only; no agent ever reads it.
 
-Both agents are invoked with `claude --print --output-format stream-json --verbose --max-turns 6` from a fresh `/tmp` directory. The student is constrained to `--tools Bash`; the tutor is constrained to `--tools Read,Bash`; both use strict MCP config, project-only settings, disabled slash commands, and no session persistence. The runner reads the resulting stream-json from the conversation file and walks it to extract the final assistant text content for grading.
+Both agents are invoked with `claude --print --output-format stream-json --verbose --max-turns 6` from a fresh `/tmp` directory. The student is constrained and auto-allowed with `--tools Bash --allowedTools Bash`; the tutor is constrained and auto-allowed with `--tools Read,Bash --allowedTools Read,Bash`; both use strict MCP config, project-only settings, disabled slash commands, and no session persistence. The runner reads the resulting stream-json from the conversation file and walks it to extract the final assistant text content for grading.
 
 ## How to run
 

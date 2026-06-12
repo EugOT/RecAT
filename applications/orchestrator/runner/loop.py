@@ -180,6 +180,8 @@ def invoke_claude_isolated(
             str(max_turns),
             "--tools",
             allowed_tools,
+            "--allowedTools",
+            allowed_tools,
             "--strict-mcp-config",
             "--setting-sources",
             "project",

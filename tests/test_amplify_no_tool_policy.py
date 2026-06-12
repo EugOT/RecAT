@@ -116,3 +116,54 @@ def test_probe_outcome_taxonomy_separates_harness_failures() -> None:
         )
         == "model_correct"
     )
+
+
+def test_cell_state_excludes_harness_failures_from_estimate() -> None:
+    cell = calibrate.CellState(idx=0)
+    harness_failure = calibrate.ProbeResult(
+        cell_idx=0,
+        label="case",
+        expression="2 * 5",
+        truth=10,
+        reported=None,
+        passed=False,
+        elapsed_s=0.0,
+        conv_path="conv.jsonl",
+        err_path="stderr.txt",
+        returncode=1,
+        outcome="cli_nonzero",
+    )
+    model_miss = calibrate.ProbeResult(
+        cell_idx=0,
+        label="case",
+        expression="2 * 5",
+        truth=10,
+        reported=None,
+        passed=False,
+        elapsed_s=0.0,
+        conv_path="conv.jsonl",
+        err_path="stderr.txt",
+        returncode=0,
+        outcome="malformed",
+    )
+    model_hit = calibrate.ProbeResult(
+        cell_idx=0,
+        label="case",
+        expression="2 * 5",
+        truth=10,
+        reported=10,
+        passed=True,
+        elapsed_s=0.0,
+        conv_path="conv.jsonl",
+        err_path="stderr.txt",
+        returncode=0,
+        outcome="model_correct",
+    )
+
+    cell.update(harness_failure)
+    cell.update(model_miss)
+    cell.update(model_hit)
+
+    assert len(cell.history) == 3
+    assert cell.n == 2
+    assert cell.k == 1
