@@ -36,7 +36,7 @@ What gets checked:
      reports it separately.
 
 Usage:
-  python3 verify/trace_verify.py <trace.jsonl>
+  pixi run python verify/trace_verify.py <trace.jsonl>
 
 Exits 0 on success, 1 on failure. Prints one summary line:
 

@@ -87,14 +87,16 @@ the variable `x`) and evaluates it on every integer in
 `[0, x_domain_max]` against the ground-truth formula. Pass requires
 every output to match.
 
-## The .claude/ sandbox bypass (load-bearing detail)
+## The .claude/ sandbox path policy (load-bearing detail)
 
 Claude Code's filesystem sandbox treats any path containing
 `.claude/` as sensitive and rejects writes to it from agent tool
-calls (`Bash`, `Write`, `Edit`) **even under
-`--permission-mode bypassPermissions`**. Bypass-mode bypasses the
-*per-tool-call user prompt*, not the hardcoded `.claude/` path
-policy. So a parent agent attempting
+calls (`Bash`, `Write`, `Edit`) **even when those tools are
+auto-allowed**. Older runner revisions used
+`--permission-mode bypassPermissions`; the current runner grants only
+`Read,Write,Edit,Bash` and auto-allows those tools. The hardcoded
+`.claude/` path policy remains load-bearing either way. So a parent
+agent attempting
 
 ```text
 Bash: mkdir -p /tmp/recurse-iter-1/.claude
@@ -188,7 +190,12 @@ The wrapper copies `state/agent-program.initial.md` to `state/agent-program.md` 
 claude --print "Begin a recursive self-improvement trial on instance_id=$INSTANCE..."
        --output-format stream-json --verbose
        --max-turns 200
-       --permission-mode bypassPermissions
+       --tools Read,Write,Edit,Bash
+       --allowedTools Read,Write,Edit,Bash
+       --strict-mcp-config
+       --setting-sources project
+       --disable-slash-commands
+       --no-session-persistence
        > traces/parent.conversation.jsonl
        2> traces/parent.stderr.txt
 ```

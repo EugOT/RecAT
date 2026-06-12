@@ -34,7 +34,7 @@ The closed-form prediction this experiment validates: given a deliberately minim
    - `<S>` is the digit sum of N (sum of decimal digits) as an integer
    - `<H>` is **the first 8 lowercase hex characters of `sha256(f"{N}-{S}").hexdigest()`**
 
-   Example for N = 12345: digit sum is 15, sha256("12345-15").hexdigest() starts with `0fb46e0e`, so the correct output is `DIGIT_SUM=15;CHECK=0fb46e0e`.
+   Example for N = 12345: digit sum is 15, sha256("12345-15").hexdigest() starts with `bd6cf6e0`, so the correct output is `DIGIT_SUM=15;CHECK=bd6cf6e0`.
 
    The CHECK component is the load-bearing piece. **No language model can produce a correct 8-char SHA-256 prefix mentally.** The student MUST use `python3` via the Bash tool to compute it. Your job, eventually, is to teach the student to do that.
 

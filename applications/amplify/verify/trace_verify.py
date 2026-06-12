@@ -24,7 +24,7 @@ What gets checked:
      means it got it wrong. This is the entire experimental measurement.
 
 Usage:
-  python3 verify/trace_verify.py <trace.jsonl>
+  pixi run python verify/trace_verify.py <trace.jsonl>
 
 Exits 0 on success, 1 on failure. Prints one summary line:
 

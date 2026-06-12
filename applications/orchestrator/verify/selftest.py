@@ -7,7 +7,7 @@ converges in round 3, confirms trace_verify.py accepts it, then
 plants regressions and confirms each one is rejected with a specific
 reason.
 
-Run:  python3 verify/selftest.py
+Run:  pixi run selftest-orchestrator
 Exit: 0 on success, nonzero if any check fails.
 """
 
@@ -151,7 +151,7 @@ def run_verify(events: list[dict]) -> tuple[int, str]:
     path = write_trace(events)
     try:
         proc = subprocess.run(
-            ["python3", str(VERIFY), str(path)],
+            [sys.executable, str(VERIFY), str(path)],
             capture_output=True,
             text=True,
         )
@@ -241,19 +241,17 @@ def main() -> int:
         if ev["event"] == "run_end":
             ev["data"]["status"] = "converged"
             break
-    ok &= expect_fail(
-        "false 'converged' below threshold", bad, "< threshold"
-    )
+    ok &= expect_fail("false 'converged' below threshold", bad, "< threshold")
 
     # 5. Unknown event type.
     bad = copy.deepcopy(base)
     bad[3]["event"] = "totally_made_up"
     ok &= expect_fail("unknown event type", bad, "unknown event type")
 
-    # 6. Test_index reordered (out of order).
+    # 6. Test_index out of range.
     bad = copy.deepcopy(base)
-    # Find first round_start, swap the first two student_invokes.
-    for i, ev in enumerate(bad):
+    # Corrupt the first round's first student invocation.
+    for ev in bad:
         if ev["event"] == "student_invoke" and ev["data"]["round"] == 1:
             ev["data"]["test_index"] = 5  # garbage
             break

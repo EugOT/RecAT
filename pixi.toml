@@ -1,0 +1,30 @@
+[workspace]
+name = "recat"
+version = "0.1.0"
+description = "Agent reliability experiments and verifier harnesses"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+python = ">=3.12,<3.14"
+matplotlib = "*"
+pytest = "*"
+ruff = "*"
+shellcheck = "*"
+
+[tasks]
+compile = "python -m compileall applications tests"
+selftest-orchestrator = "python applications/orchestrator/verify/selftest.py"
+selftest-amplify = "python applications/amplify/verify/selftest.py"
+orchestrator-run = { cmd = "bash runner/run.sh", cwd = "applications/orchestrator" }
+orchestrator-verify-all = { cmd = "bash verify/trace_verify_all.sh", cwd = "applications/orchestrator" }
+amplify-verify-all = { cmd = "bash verify/trace_verify_all.sh", cwd = "applications/amplify" }
+shell-syntax = "bash -c 'find applications -name \"*.sh\" -print0 | xargs -0 -n1 bash -n'"
+shellcheck = "shellcheck applications/amplify/runner/run.sh applications/amplify/verify/trace_verify_all.sh applications/orchestrator/runner/run.sh applications/orchestrator/verify/trace_verify_all.sh applications/recurse/run.sh applications/recurse/bin/setup-iter.sh"
+lint = "ruff check applications tests"
+format-check = "ruff format --check applications/amplify/runner/amplify.py applications/amplify/runner/calibrate.py applications/amplify/verify/aggregate.py applications/amplify/verify/selftest.py applications/orchestrator/runner/loop.py applications/orchestrator/verify/selftest.py tests"
+test = "pytest"
+verify = { depends-on = ["compile", "test", "selftest-orchestrator", "selftest-amplify", "shell-syntax", "shellcheck", "lint", "format-check"] }
+calibrate = "python applications/amplify/runner/calibrate.py"
+amplify = "python applications/amplify/runner/amplify.py"
+aggregate-amplify = "python applications/amplify/verify/aggregate.py"

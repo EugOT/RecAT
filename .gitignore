@@ -1,0 +1,8 @@
+# Local Pixi environment and tool caches
+.pixi/
+.pytest_cache/
+.ruff_cache/
+
+# Python bytecode
+__pycache__/
+*.py[cod]

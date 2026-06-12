@@ -60,7 +60,9 @@ def run_isolated_probe(prompt: str, model: str, ...) -> ProbeResult:
         # parse and return
 ```
 
-The minimal CLAUDE.md is just a few lines reinforcing the no-calculator rule. The minimal settings.json uses `{"permissions": {"allow": []}}` to deny all tools — this is the load-bearing piece that prevents the model from reaching for Python.
+The minimal CLAUDE.md is just a few lines reinforcing the no-calculator rule.
+
+> **2026-06-12 correction:** this historical note incorrectly treated `{"permissions": {"allow": []}}` as a restrictive allowlist. Current Claude Code behavior and local traces show that `permissions.allow` is not sufficient to deny tools, especially when paired with `--permission-mode bypassPermissions`. The current fix must use CLI-level restriction (`--tools ""`, strict MCP configuration, and no bypass mode for no-tool probes) and verify the emitted system-init tool surface.
 
 This pattern produces:
 
@@ -89,13 +91,13 @@ These were not statistically different, but they're also not meaningful comparis
 
 When we rebuild the non-isolated arm correctly (using `claude --resume` chaining for multi-turn or some other multi-turn primitive), the matched-prompt invariant should be re-checked.
 
-### 5. The non-isolated arm needs a complete redesign
+### 5. The non-isolated arm needed a complete redesign
 
-This is a separate issue from the isolation analysis but is mentioned in the [amplify README](../../applications/amplify/README.md). The current `amplify.py:NON_ISOLATED_PROMPT_TEMPLATE` asks one `claude --print` invocation to do N attempts in one context — but `--print` is single-turn, so the result is one generation containing N labeled sections, not N multi-turn attempts.
+This was a separate issue from the isolation analysis but is mentioned in the [amplify README](../../applications/amplify/README.md). The original `amplify.py:NON_ISOLATED_PROMPT_TEMPLATE` asked one `claude --print` invocation to do N attempts in one context — but `--print` is single-turn, so the result was one generation containing N labeled sections, not N multi-turn attempts.
 
 A correctly-designed non-isolated arm requires multi-turn `claude --resume` chaining: one user message per attempt, each producing its own assistant turn, with prior turns visible to subsequent ones. This is the "agent retries within a session" scenario the experiment is supposed to model.
 
-The investigation in this folder does not address this redesign, but it is a prerequisite for any real Pass 2 result.
+The current runner has since been rebuilt around `--session-id` plus `--resume` chaining. Future methodology work should validate that path together with the no-tool CLI restriction above.
 
 ## Recommended next steps, in order
 
@@ -107,14 +109,14 @@ The investigation in this folder does not address this redesign, but it is a pre
 
 ### Short-term (1 day, ~$5–10)
 
-4. **Refactor `calibrate.probe()` to use per-probe `/tmp` isolation.** Add a helper that wraps `subprocess.run` with `tempfile.TemporaryDirectory` and writes a minimal `.claude/`. Make this the default, with a flag to opt out for backwards compat.
+4. **Refactor `calibrate.probe()` to use per-probe `/tmp` isolation and real tool denial.** Add a helper that wraps `subprocess.run` with `tempfile.TemporaryDirectory`, writes minimal project settings, invokes Claude Code with `--tools ""` and strict MCP configuration, and verifies the system-init tool surface. Make this the default, with a flag to opt out for backwards compatibility only if needed.
 5. **Re-run calibration under `/tmp` isolation.** Confirm it produces a similar p̂ to the original calibration on the same cell. This validates the new code path.
 6. **Re-run M=15 amplify under `/tmp` isolation.** Compare the per-probe feature distributions to the new calibration. They should now match within sampling noise. The pass rate should be tighter against the original calibration.
 
 ### Medium-term (1–3 days, ~$10–30)
 
 7. **Run M=30 or M=50 amplify under `/tmp` isolation.** This gives the statistical power needed to actually measure the amplification curve and detect any real gap between predicted and empirical.
-8. **Redesign the non-isolated arm** using multi-turn `claude --resume` chaining. Verify the matched-prompt invariant at N=1.
+8. **Keep validating the redesigned non-isolated arm** using multi-turn `claude --resume` chaining. Verify the matched-prompt invariant at N=1 after any Claude Code CLI or prompt-policy change.
 9. **Run the full M=50 two-arm experiment** with both arms properly isolated.
 10. **Update [report/report.md](../../applications/amplify/report/report.md)** with the new results, the cache outlier characterization, and the methodology fixes.
 
@@ -132,13 +134,13 @@ This investigation does NOT undermine that claim. What it does is:
 1. **Validate the experimental contract.** The probes used in calibration and amplification really are operating in the same regime, modulo Anthropic-side noise we can characterize but not control.
 2. **Identify a real noise source** (cache outliers) that any future amplify run needs to be designed around.
 3. **Provide a clean isolation primitive** (per-probe `/tmp`) that makes the experiment reproducible and removes a class of subtle leakage bugs.
-4. **Clarify the dependency on the local `.claude/`.** The local CLAUDE.md and rules are load-bearing for the no-calculator rule. Without them, the model uses Python and the experiment is silently broken. The minimal isolated CLAUDE.md preserves this load-bearing property in a portable way.
+4. **Clarify the dependency on the local `.claude/` and CLI policy.** The prompt rules are a behavioral guardrail, but current methodology must rely on CLI-enforced tool denial and system-init verification for the no-calculator contract.
 
 The path to actually publishing a Pass 2 result is now clearer than it was before this investigation:
 
 - Use per-probe `/tmp` isolation ([recommended next step #4](#short-term-1-day-510))
 - Run at M ≥ 30 to get past the cache outlier noise floor ([recommended next step #7](#medium-term-13-days-1030))
-- Redesign the non-isolated arm with multi-turn `claude --resume` ([recommended next step #8](#medium-term-13-days-1030))
+- Re-validate the multi-turn non-isolated arm with `claude --resume` after the no-tool CLI-policy fix ([recommended next step #8](#medium-term-13-days-1030))
 - Then and only then can the headline plot (isolated curve vs non-isolated curve vs closed-form prediction) be honest
 
 ## The cost of not understanding this
@@ -152,13 +154,15 @@ The investigation took ~1 hour and ~$2 of Haiku and gave us a complete causal ch
 
 ## Fix outcome (executed after this analysis)
 
-After this investigation was complete, the recommended fix was applied: `calibrate.probe()` was modified to wrap the `subprocess.run` call in a `tempfile.TemporaryDirectory()` with a freshly written minimal `.claude/CLAUDE.md` and `.claude/settings.json` per probe. The pattern is exactly the one in `applications/orchestrator/runner/loop.py:invoke_claude_isolated()`. `amplify.py` was given a `--skip-non-isolated` flag (the current non-isolated arm uses `--print` which is single-turn and broken). No other changes.
+After this investigation was complete, the first recommended fix was applied: `calibrate.probe()` was modified to wrap the `subprocess.run` call in a `tempfile.TemporaryDirectory()` with a freshly written minimal `.claude/CLAUDE.md` and `.claude/settings.json` per probe. The pattern is exactly the one in `applications/orchestrator/runner/loop.py:invoke_claude_isolated()`.
+
+> **2026-06-12 status update:** this paragraph used to say the non-isolated arm was still broken and only `--skip-non-isolated` was available. That is now stale. The current `amplify.py` has a multi-turn non-isolated arm based on `--session-id` and `--resume`; the current remediation focus is no-tool CLI enforcement and outcome taxonomy.
 
 The fix was then validated with two re-runs:
 
 ### Re-calibration under `/tmp` isolation
 
-Run: `python3 runner/calibrate.py` with the new isolated `probe()`. Trace dir: `traces/calibrate-20260408-191452/`.
+Run: `pixi run calibrate` with the new isolated `probe()`. Trace dir: `traces/calibrate-20260408-191452/`.
 
 | | Old (no isolation) | New (`/tmp` isolation) |
 | --- | --- | --- |
@@ -175,7 +179,7 @@ The new calibration landed on a different cell (cell 6 instead of cell 7). Under
 
 ### Re-amplification under `/tmp` isolation
 
-Run: `python3 runner/amplify.py --m 15 --n 1,3,5,7,9 --skip-non-isolated`. Trace dir: `traces/amplify-20260408-193738/`.
+Historical run: `python3 runner/amplify.py --m 15 --n 1,3,5,7,9 --skip-non-isolated`. Current equivalent for the isolated arm is `pixi run amplify --m 15 --n 1,3,5,7,9 --skip-non-isolated`. Trace dir: `traces/amplify-20260408-193738/`.
 
 The headline finding: **every previously-significant feature difference between calibration and amplify probes is now eliminated.**
 

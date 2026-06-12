@@ -50,19 +50,20 @@ These were located by an automated documentation search agent and used to interp
 
 ### Settings.json permissions schema
 
-**URL.** Inferred from `applications/orchestrator/runner/loop.py:STUDENT_SETTINGS_JSON` and `TUTOR_SETTINGS_JSON`.
+**URL.** Historical inference from `applications/orchestrator/runner/loop.py:STUDENT_SETTINGS_JSON` and `TUTOR_SETTINGS_JSON`; superseded by current Claude Code CLI behavior.
 
 **Pattern:**
 ```json
 {"permissions": {"allow": ["Bash", "Read"]}}
 ```
 
-In our isolated probe primitive we use:
-```json
-{"permissions": {"allow": []}, "autoMemoryEnabled": false, "hooks": {}}
+Earlier versions of this document claimed that an empty `permissions.allow` list denied all tools. That claim was wrong. Current Claude Code exposes first-class CLI controls for this contract:
+
+```bash
+claude --print "$prompt" --tools "" --strict-mcp-config --setting-sources project
 ```
 
-The empty allow list denies all tools. This is the load-bearing piece that prevents the model from reaching for `python3` via `Bash` to compute the multiplication, which would silently break the experimental contract by giving the model a calculator.
+The load-bearing check is now empirical: the system-init event in each no-tool trace must not expose `Bash`, `WebFetch`, `WebSearch`, MCP tools, or configured MCP servers. Historical traces under `applications/amplify/traces/amplify-20260408-204329/` show that the old empty-allow plus `bypassPermissions` setup still exposed those tools.
 
 ## Code references
 

@@ -11,7 +11,7 @@ script:
      failure mode the verifier is supposed to catch, and confirms that
      trace_verify.py rejects the mutated trace with a specific reason.
 
-Run:  python3 verify/selftest.py
+Run:  pixi run selftest-amplify
 Exit: 0 on success, nonzero if any check fails.
 """
 
@@ -70,7 +70,7 @@ def run_verify(events: list[dict]) -> tuple[int, str]:
     path = write_trace(events)
     try:
         proc = subprocess.run(
-            ["python3", str(VERIFY), str(path)],
+            [sys.executable, str(VERIFY), str(path)],
             capture_output=True,
             text=True,
         )
@@ -98,8 +98,8 @@ def expect_fail(name: str, events: list[dict], reason_substring: str) -> bool:
 
 
 def main() -> int:
-    base_easy = faithful_trace("test-easy", 47, 83)        # answer 3901
-    base_hard = faithful_trace("test-hard", 2929, 39393)   # answer 115382097
+    base_easy = faithful_trace("test-easy", 47, 83)  # answer 3901
+    base_hard = faithful_trace("test-hard", 2929, 39393)  # answer 115382097
 
     print("baseline acceptance:")
     ok = True

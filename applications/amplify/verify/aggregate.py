@@ -7,7 +7,7 @@ the empirical measurement of `p` for that rung — that is the entire
 output of Pass 1 (calibration).
 
 Usage:
-  python3 verify/aggregate.py [<traces_dir> [<verifier_path>]]
+  pixi run aggregate-amplify [<traces_dir> [<verifier_path>]]
 
 Defaults:
   traces_dir     = <repo>/traces
@@ -51,8 +51,7 @@ def main(argv: list[str]) -> int:
 
     # Filter out conversation files and other non-event files.
     traces = sorted(
-        p for p in traces_dir.glob("*.jsonl")
-        if not p.name.endswith(".conversation.jsonl")
+        p for p in traces_dir.glob("*.jsonl") if not p.name.endswith(".conversation.jsonl")
     )
 
     if not traces:
@@ -80,7 +79,7 @@ def main(argv: list[str]) -> int:
             rung_label[rung_index] = label
 
         proc = subprocess.run(
-            ["python3", str(verifier), str(t)],
+            [sys.executable, str(verifier), str(t)],
             capture_output=True,
             text=True,
         )
@@ -119,7 +118,7 @@ def main(argv: list[str]) -> int:
         rp = rung_pass.get(r, 0)
         rf = rung_fail.get(r, 0)
         rt = rp + rf
-        p_str = f"{rp/rt:.3f}" if rt > 0 else "n/a"
+        p_str = f"{rp / rt:.3f}" if rt > 0 else "n/a"
         label = rung_label.get(r, "?") if r >= 0 else "(ungrp)"
         print(f"  {r:<6} {label:<8} {rp:>8} {rt:>8} {p_str:>10}")
 

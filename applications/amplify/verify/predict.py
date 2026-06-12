@@ -17,10 +17,10 @@ This script is the parent's authoritative source for predicted curves.
 The verifier and the Pass 2 README both depend on it.
 
 Usage:
-  python3 verify/predict.py                      # demo grid: p in {0.55..0.95}, N in {1..9}
-  python3 verify/predict.py --p 0.7 --n 5        # one number
-  python3 verify/predict.py --p 0.7              # curve for one p across N=1,3,5,7,9
-  python3 verify/predict.py --gap-table          # for the README, with target window highlighted
+  pixi run python verify/predict.py                      # demo grid: p in {0.55..0.95}, N in {1..9}
+  pixi run python verify/predict.py --p 0.7 --n 5        # one number
+  pixi run python verify/predict.py --p 0.7              # curve for one p across N=1,3,5,7,9
+  pixi run python verify/predict.py --gap-table          # for the README, with target window highlighted
 """
 
 from __future__ import annotations

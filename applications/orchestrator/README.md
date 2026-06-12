@@ -103,13 +103,12 @@ orchestrator/
 ├── inputs/
 │   └── inputs.json                ← test cases, max_rounds, threshold, default trial count
 ├── runner/
-│   ├── run.sh                     ← shell wrapper: .venv setup, arg parsing, cache, trial loop
+│   ├── run.sh                     ← shell wrapper: arg parsing, cache, trial loop
 │   └── loop.py                    ← per-trial loop, /tmp isolation, claude invocations, events
 ├── verify/
 │   ├── trace_verify.py            ← envelope + structure + grading replay + termination
 │   ├── trace_verify_all.sh        ← aggregator
 │   └── selftest.py                ← seven planted regressions
-├── .venv/                         ← isolated Python (created on first run; gitignored)
 └── traces/                        ← output: trace JSONL + conversation log + forensic .final-student.md (gitignored)
 ```
 
@@ -125,15 +124,14 @@ For one trial (`trial-001`), the `traces/` directory contains:
 - `trial-001.tutor-r{round}.conversation.jsonl` and `.agent-stderr.txt` — same for each tutor invocation.
 - `trial-001.final-student.md` — forensic dump of the final patched student instructions, written once at the end of the trial. Write-only; no agent ever reads it.
 
-Both agents are invoked with `claude --print --output-format stream-json --verbose --max-turns 6 --permission-mode bypassPermissions` from a fresh `/tmp` directory; the runner reads the resulting stream-json from the conversation file and walks it to extract the final assistant text content for grading.
+Both agents are invoked with `claude --print --output-format stream-json --verbose --max-turns 6` from a fresh `/tmp` directory. The student is constrained and auto-allowed with `--tools Bash --allowedTools Bash`; the tutor is constrained and auto-allowed with `--tools Read,Bash --allowedTools Read,Bash`; both use strict MCP config, project-only settings, disabled slash commands, and no session persistence. The runner reads the resulting stream-json from the conversation file and walks it to extract the final assistant text content for grading.
 
 ## How to run
 
 Once a `claude` CLI is available in your PATH:
 
 ```bash
-cd applications/orchestrator
-./runner/run.sh 3        # 3 independent trials of the loop
+pixi run orchestrator-run -- 3        # 3 independent trials of the loop
 ```
 
 This produces three JSONL trace files in `traces/`. Each trial starts from a fresh in-memory copy of `templates/student-initial.md`, so trials are independent.
@@ -141,7 +139,7 @@ This produces three JSONL trace files in `traces/`. Each trial starts from a fre
 Verify the results:
 
 ```bash
-./verify/trace_verify_all.sh
+pixi run orchestrator-verify-all
 ```
 
 The aggregator reports per-trial pass/fail and (informationally) flags any trial that converged in just 1 round, which would mean the tutor/student loop never engaged.
@@ -151,7 +149,7 @@ The aggregator reports per-trial pass/fail and (informationally) flags any trial
 Before running real trials:
 
 ```bash
-python3 verify/selftest.py
+pixi run selftest-orchestrator
 ```
 
 Builds a faithful 3-round converged trace, plants seven regressions, confirms all are rejected with specific reasons.
@@ -199,12 +197,11 @@ Real iteration with no contamination:
 ### How to reproduce
 
 ```bash
-cd applications/orchestrator
-./runner/run.sh 1 --fresh --yes    # one trial, ~2 minutes on Haiku
-./verify/trace_verify_all.sh       # verify the resulting trace
+pixi run orchestrator-run -- 1 --fresh --yes    # one trial, ~2 minutes on Haiku
+pixi run orchestrator-verify-all                # verify the resulting trace
 ```
 
-The first invocation also creates `applications/orchestrator/.venv` if it doesn't exist (Python stdlib only, no pip installs). Both the student and the tutor invocations run from fresh `/tmp` directories that are cleaned up between invocations.
+Both the student and the tutor invocations run from fresh `/tmp` directories that are cleaned up between invocations. Harness Python comes from the Pixi environment.
 
 ## See also
 

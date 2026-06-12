@@ -14,6 +14,7 @@ set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERIFY="$ROOT/verify/trace_verify.py"
 TRACES_DIR="$ROOT/traces"
+PYTHON="${PYTHON:-python}"
 
 if [ ! -d "$TRACES_DIR" ]; then
     echo "No traces/ directory. Run ./runner/run.sh first." >&2
@@ -45,7 +46,7 @@ single_round_passes=0
 failures=()
 
 for t in "${traces[@]}"; do
-    out=$(python3 "$VERIFY" "$t")
+    out=$("$PYTHON" "$VERIFY" "$t")
     verdict=${out#RESULT: }
     verdict=${verdict%% *}
     case "$verdict" in
@@ -53,7 +54,7 @@ for t in "${traces[@]}"; do
             pass=$((pass + 1))
             # Inspect the trace to see how many rounds it ran. If just 1,
             # the iteration loop never engaged — flag separately.
-            rounds=$(python3 -c "
+            rounds=$("$PYTHON" -c "
 import json, sys
 n = 0
 with open('$t') as f:
