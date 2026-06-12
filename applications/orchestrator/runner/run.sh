@@ -9,10 +9,10 @@
 # shell quoting of multi-line student output is too brittle.
 #
 # Usage:
-#   ./runner/run.sh                # use trials_per_run_default from inputs.json
-#   ./runner/run.sh 5              # 5 trials
-#   ./runner/run.sh 5 --fresh      # 5 trials, wipe traces/ first
-#   ./runner/run.sh 5 --resume     # 5 trials, skip already-complete traces
+#   pixi run orchestrator-run                 # use trials_per_run_default
+#   pixi run orchestrator-run -- 5            # 5 trials
+#   pixi run orchestrator-run -- 5 --fresh    # 5 trials, wipe traces/ first
+#   pixi run orchestrator-run -- 5 --resume   # 5 trials, skip complete traces
 
 set -uo pipefail
 
@@ -20,29 +20,12 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 INPUTS_FILE="$ROOT/inputs/inputs.json"
 TRACES_DIR="$ROOT/traces"
 LOOP_PY="$ROOT/runner/loop.py"
-VENV_DIR="$ROOT/.venv"
+PYTHON="${PYTHON:-python}"
 
 mkdir -p "$TRACES_DIR"
 
-# ── Per-application isolated Python env ─────────────────────────────────
-# All Python invocations from this runner — and from any python3 calls
-# the student or tutor agents make via the Bash tool while running under
-# this script — go through the .venv at the application root. The .venv
-# is created on first run if it doesn't exist; the application uses
-# stdlib only, so no pip installs are required.
-if [ ! -x "$VENV_DIR/bin/python3" ]; then
-    echo "Creating .venv at $VENV_DIR..." >&2
-    python3 -m venv "$VENV_DIR" >&2 || {
-        echo "ERROR: failed to create .venv at $VENV_DIR" >&2
-        exit 1
-    }
-fi
-export PATH="$VENV_DIR/bin:$PATH"
-# Sanity-check: confirm `python3` now resolves to the .venv binary.
-ACTIVE_PY="$(command -v python3)"
-if [ "$ACTIVE_PY" != "$VENV_DIR/bin/python3" ]; then
-    echo "WARNING: python3 resolves to $ACTIVE_PY, expected $VENV_DIR/bin/python3" >&2
-fi
+# Run this wrapper through Pixi so the harness Python and any child-agent
+# `python3` Bash calls resolve inside the reproducible project environment.
 
 # ── Argument parsing ───────────────────────────────────────────────────
 TRIALS_ARG=""
@@ -80,7 +63,7 @@ EOF
 done
 
 # ── Read inputs.json ───────────────────────────────────────────────────
-DEFAULT_TRIALS=$(python3 -c "import json; print(json.load(open('$INPUTS_FILE'))['trials_per_run_default'])")
+DEFAULT_TRIALS=$("$PYTHON" -c "import json; print(json.load(open('$INPUTS_FILE'))['trials_per_run_default'])")
 TRIALS="${TRIALS_ARG:-$DEFAULT_TRIALS}"
 
 # ── Cache-mode gate ────────────────────────────────────────────────────
@@ -150,7 +133,7 @@ for trial in $(seq 1 "$TRIALS"); do
     # loop.py writes per-invocation conversation logs into TRACES_DIR
     # following the convention <trial_id>.<label>.conversation.jsonl
     # and per-invocation stderr to <trial_id>.<label>.agent-stderr.txt.
-    python3 "$LOOP_PY" \
+    "$PYTHON" "$LOOP_PY" \
         --root "$ROOT" \
         --trial-id "$trial_id" \
         --trace-file "$trace_file" \

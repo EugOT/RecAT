@@ -53,7 +53,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -141,6 +140,7 @@ def invoke_claude_isolated(
     trial_id: str,
     label: str,
     max_turns: int = 6,
+    allowed_tools: str = "",
 ) -> str:
     """Invoke `claude --print` in a fresh /tmp directory.
 
@@ -178,8 +178,13 @@ def invoke_claude_isolated(
             "--verbose",
             "--max-turns",
             str(max_turns),
-            "--permission-mode",
-            "bypassPermissions",
+            "--tools",
+            allowed_tools,
+            "--strict-mcp-config",
+            "--setting-sources",
+            "project",
+            "--disable-slash-commands",
+            "--no-session-persistence",
         ]
         try:
             with conv_file.open("w") as conv_out, stderr_file.open("w") as err_out:
@@ -194,6 +199,13 @@ def invoke_claude_isolated(
         except FileNotFoundError:
             print("ERROR: 'claude' CLI not found in PATH.", file=sys.stderr)
             sys.exit(2)
+
+        if proc.returncode != 0:
+            print(
+                f"WARNING: claude exited {proc.returncode} for {trial_id}.{label}; "
+                f"see {stderr_file}",
+                file=sys.stderr,
+            )
 
         # Read back the conversation log to extract the final assistant text.
         stream_json_text = conv_file.read_text()
@@ -295,7 +307,6 @@ def run_trial(
     )
 
     final_status = "aborted"
-    final_pass_rate = 0.0
 
     for round_num in range(1, max_rounds + 1):
         print(f"  round {round_num}", file=sys.stderr)
@@ -321,6 +332,7 @@ def run_trial(
                 traces_dir=traces_dir,
                 trial_id=trial_id,
                 label=f"student-r{round_num}-t{test_index}",
+                allowed_tools="Bash",
             )
             passed, reason = grade_student_output(n, raw_output)
             writer.emit(
@@ -360,8 +372,6 @@ def run_trial(
             f"    pass_count={pass_count}/{test_count} pass_rate={pass_rate:.4f}",
             file=sys.stderr,
         )
-        final_pass_rate = pass_rate
-
         # Convergence?
         if pass_rate >= threshold - 1e-9:
             writer.emit(
@@ -403,6 +413,7 @@ def run_trial(
             trial_id=trial_id,
             label=f"tutor-r{round_num}",
             max_turns=6,
+            allowed_tools="Read,Bash",
         )
 
         new_md = extract_patch(tutor_raw)

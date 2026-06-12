@@ -134,9 +134,11 @@ Phase 1 (build): Modeled on `applications/orchestrator/runner/loop.py:invoke_cla
 
 1. `tempfile.TemporaryDirectory(prefix="amplify-probe-")` creates a fresh `/tmp/amplify-probe-XXXX/`
 2. Write `<tmp>/.claude/CLAUDE.md` with a minimal "compute by hand" instruction
-3. Write `<tmp>/.claude/settings.json` with `{"permissions": {"allow": []}}` to deny ALL tools including Bash
-4. `subprocess.run([..."claude", "--print", ...], cwd=str(tmp_path))`
+3. Write `<tmp>/.claude/settings.json` with minimal project-local settings (`autoMemoryEnabled: false`, empty hooks)
+4. `subprocess.run([..."claude", "--print", "--tools", "", "--strict-mcp-config", ...], cwd=str(tmp_path))`
 5. `tempfile.TemporaryDirectory` auto-cleans on context exit
+
+2026-06-12 correction: the earlier version of step 3 incorrectly claimed that an empty `permissions.allow` list denies all tools. Tool denial must be enforced by CLI flags and verified from the emitted system-init metadata.
 
 Phase 2 (verify): Spawn one claude in a temp dir with Bash temporarily allowed, ask it to print `pwd` and `ls .claude/`, confirm what it reports.
 

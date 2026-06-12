@@ -25,9 +25,9 @@ Reads runner/amplify.py's report.json and renders:
   5. **Failure error magnitudes** — log scale, both arms.
 
 Usage:
-  python3 runner/amplify_plot.py traces/amplify-<ts>/report.json
+  pixi run python applications/amplify/runner/amplify_plot.py traces/amplify-<ts>/report.json
 
-Dependencies: matplotlib (install in .venv if not already there).
+Dependencies: matplotlib from the Pixi environment.
 """
 
 from __future__ import annotations
@@ -35,20 +35,17 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import re
 import sys
 from pathlib import Path
-from typing import Optional
 
 try:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
     import matplotlib.colors as mcolors
 except ImportError:
     print("ERROR: matplotlib required. Install with:", file=sys.stderr)
-    print("  .venv/bin/pip install matplotlib", file=sys.stderr)
+    print("  pixi install", file=sys.stderr)
     sys.exit(1)
 
 

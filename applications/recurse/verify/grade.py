@@ -2,7 +2,7 @@
 """Grader for recurse.
 
 Usage:
-    python3 verify/grade.py "<lambda source>" <a> <b> <c> <m> <x_domain_max>
+    pixi run python verify/grade.py "<lambda source>" <a> <b> <c> <m> <x_domain_max>
 
 Parses the lambda source under a strict AST whitelist (no function
 calls, no imports, no names besides x), evaluates it on every integer

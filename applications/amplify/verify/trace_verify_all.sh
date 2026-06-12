@@ -11,4 +11,5 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-exec python3 "$ROOT/verify/aggregate.py" "$ROOT/traces" "$ROOT/verify/trace_verify.py"
+PYTHON="${PYTHON:-python}"
+exec "$PYTHON" "$ROOT/verify/aggregate.py" "$ROOT/traces" "$ROOT/verify/trace_verify.py"

@@ -22,7 +22,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 
 usage() {
     cat <<'EOF'
@@ -96,7 +96,12 @@ claude --print "$PROMPT" \
     --output-format stream-json \
     --verbose \
     --max-turns 200 \
-    --permission-mode bypassPermissions \
+    --tools Read,Write,Edit,Bash \
+    --allowedTools Read,Write,Edit,Bash \
+    --strict-mcp-config \
+    --setting-sources project \
+    --disable-slash-commands \
+    --no-session-persistence \
     > traces/parent.conversation.jsonl \
     2> traces/parent.stderr.txt
 

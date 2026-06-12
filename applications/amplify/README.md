@@ -52,7 +52,7 @@ The search is multi-cell adaptive: bracket with binary search, triangulate neigh
 **Result for Haiku 4.5.** Cell 6 (`muldiv-7x7//5`): `n=45, k=35, p̂=0.778, 95% CI [0.637, 0.875]`. Each probe runs in its own `tempfile.TemporaryDirectory()` with a freshly written minimal `.claude/` — no shared filesystem state across probes.
 
 ```bash
-python3 runner/calibrate.py
+pixi run calibrate
 ```
 
 ## Pass 2 — Amplification
@@ -116,23 +116,23 @@ This turns the project's scope-discipline claim into a quantitative statement: `
 cd applications/amplify
 
 # Smoke (M=3, N=1,5,9; both arms)
-python3 runner/amplify.py
+pixi run amplify
 
 # Minimum meaningful run (M=15, N=1,3,5,7,9; ~270 invocations, ~45–50 min)
-python3 runner/amplify.py --m 15 --n 1,3,5,7,9
+pixi run amplify --m 15 --n 1,3,5,7,9
 
 # Bigger run (M=30; ~540 invocations, ~90 min)
-python3 runner/amplify.py --m 30 --n 1,3,5,7,9
+pixi run amplify --m 30 --n 1,3,5,7,9
 
 # Isolated arm only (skips the multi-turn non-isolated sessions)
-python3 runner/amplify.py --m 15 --n 1,3,5,7,9 --skip-non-isolated
+pixi run amplify --m 15 --n 1,3,5,7,9 --skip-non-isolated
 ```
 
 Pass 2 reads the most recent `calibrate-*/report.json` automatically; pass `--calibration <path>` to pin a specific one.
 
 ## Why the model is forbidden from using a calculator
 
-If the child agent can call `python3`, measured `p` becomes 1.0 and there's nothing to amplify. The **parent** (harness, verifier) uses Python freely to compute ground truth; the **child** is forbidden from using any tool to compute the expression. The rule is on the honor system; full text lives in [`.claude/rules/arithmetic.md`](.claude/rules/arithmetic.md).
+If the child agent can call `python3`, measured `p` becomes 1.0 and there's nothing to amplify. The **parent** (harness, verifier) uses Python freely to compute ground truth; the **child** is forbidden from using any tool to compute the expression. Current runners enforce that at the Claude Code CLI layer with `--tools ""` and strict MCP configuration; the prompt remains a redundant behavioral guardrail.
 
 ## What's in this directory
 
@@ -162,7 +162,7 @@ amplify/
 └── traces/                           ← output (gitignored)
 ```
 
-Each probe spawned by `calibrate.probe()` runs in its own freshly-created `tempfile.TemporaryDirectory()` with a minimal `.claude/CLAUDE.md` and a `settings.json` that denies all tools. The local `applications/amplify/.claude/` is **not** auto-loaded by probes — it's kept in the source tree as the program-of-record but is not load-bearing for the experiment. The pattern is modeled on `applications/orchestrator/runner/loop.py:invoke_claude_isolated()`.
+Each probe spawned by `calibrate.probe()` runs in its own freshly-created `tempfile.TemporaryDirectory()` with a minimal `.claude/CLAUDE.md` and project-local `settings.json`. Tool denial is enforced by Claude Code CLI flags (`--tools ""`, `--strict-mcp-config`, and project-only settings), not by `permissions.allow`. The local `applications/amplify/.claude/` is **not** auto-loaded by probes — it's kept in the source tree as the program-of-record but is not load-bearing for the experiment. The pattern is modeled on `applications/orchestrator/runner/loop.py:invoke_claude_isolated()`.
 
 ## Status
 

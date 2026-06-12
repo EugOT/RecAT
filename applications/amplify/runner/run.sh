@@ -28,18 +28,21 @@
 #   ./runner/run.sh 10             # 10 trials per problem (recommended for calibration)
 #
 # Requirements:
-#   - python3 in PATH (used to parse inputs.json and to emit trace events
-#     from the agent — note: the agent is FORBIDDEN from using python3 to
-#     compute the multiplication itself; see .claude/rules/arithmetic.md)
+#   - run through Pixi so harness Python comes from the project environment
+#     (the agent is FORBIDDEN from using python3 to compute the multiplication
+#     itself; see .claude/rules/arithmetic.md)
 #   - claude CLI in PATH, capable of headless invocation
 #   - The cwd when invoking `claude` is the amplify directory, so that
 #     the .claude/ in this directory is loaded.
+#   - This legacy trace-emission runner exposes Bash only so the agent can
+#     append JSONL events. No-tool measurement uses calibrate.py/amplify.py.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 INPUTS_FILE="$ROOT/inputs/inputs.json"
 TRACES_DIR="$ROOT/traces"
+PYTHON="${PYTHON:-python}"
 mkdir -p "$TRACES_DIR"
 
 # Flag parsing. The legacy positional argument is TRIALS (an integer), so
@@ -113,13 +116,13 @@ done
 # Default trials per problem: read from inputs.json unless overridden on the command line.
 # Pass the path as argv[1] rather than interpolating into source, so paths
 # containing quotes or other shell metacharacters can't break the script.
-DEFAULT_TRIALS=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["trials_per_problem_default"])' "$INPUTS_FILE")
+DEFAULT_TRIALS=$("$PYTHON" -c 'import json,sys; print(json.load(open(sys.argv[1]))["trials_per_problem_default"])' "$INPUTS_FILE")
 TRIALS="${TRIALS_ARG:-$DEFAULT_TRIALS}"
 
 # Read the test matrix and emit (rung_index, rung_label, problem_index, a, b)
 # tuples, one per line, tab-separated so labels containing spaces are safe.
 # Optionally filter by rung.
-PAIRS=$(python3 -c '
+PAIRS=$("$PYTHON" -c '
 import json, sys
 inputs = json.load(open(sys.argv[1]))
 rung_filter = sys.argv[2]
@@ -268,7 +271,12 @@ while IFS=$'\t' read -r rung label problem_index a b; do
                 --output-format stream-json \
                 --verbose \
                 --max-turns 30 \
-                --permission-mode bypassPermissions \
+                --tools Bash \
+                --allowedTools Bash \
+                --strict-mcp-config \
+                --setting-sources project \
+                --disable-slash-commands \
+                --no-session-persistence \
                 < /dev/null \
                 > "$conv_file" \
                 2> "$stderr_file"

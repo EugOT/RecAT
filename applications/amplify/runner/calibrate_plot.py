@@ -28,9 +28,9 @@ available) and writes a multi-panel PNG visualizing:
      or wild misses (model gave up).
 
 Usage:
-  python3 runner/calibrate_plot.py <report.json>
-  python3 runner/calibrate_plot.py traces/calibrate-20260408-124726/
-  python3 runner/calibrate_plot.py --help
+  pixi run python applications/amplify/runner/calibrate_plot.py <report.json>
+  pixi run python applications/amplify/runner/calibrate_plot.py traces/calibrate-20260408-124726/
+  pixi run python applications/amplify/runner/calibrate_plot.py --help
 
 Output:
   Saves a PNG next to the input (or to --out if specified).
@@ -48,7 +48,6 @@ import math
 import re
 import sys
 from pathlib import Path
-from typing import Optional
 
 try:
     import matplotlib
@@ -57,7 +56,7 @@ try:
     import matplotlib.patches as mpatches
 except ImportError:
     print("ERROR: matplotlib not installed.", file=sys.stderr)
-    print("       Install with:  pip install matplotlib", file=sys.stderr)
+    print("       Run: pixi install", file=sys.stderr)
     sys.exit(1)
 
 
@@ -354,7 +353,7 @@ def plot_calibration(report: dict, out_path: Path) -> None:
     # Figure title with summary
     # ------------------------------------------------------------------
     summary_lines = [
-        f"amplify calibration analysis",
+        "amplify calibration analysis",
     ]
     if cal_cell:
         lo, ph, hi = wilson_ci(cal_cell["k"], cal_cell["n"])

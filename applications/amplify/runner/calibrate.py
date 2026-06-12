@@ -40,9 +40,9 @@ Output:
   - Conversation logs and stderr files written to traces/calibrate-<ts>/.
 
 Usage:
-  python3 runner/calibrate.py
-  python3 runner/calibrate.py --model claude-haiku-4-5-20251001 --budget 60
-  python3 runner/calibrate.py --target-low 0.55 --target-high 0.85
+  pixi run calibrate
+  pixi run calibrate --model claude-haiku-4-5-20251001 --budget 60
+  pixi run calibrate --target-low 0.55 --target-high 0.85
 """
 
 from __future__ import annotations
@@ -65,6 +65,7 @@ from typing import Callable, Optional
 # ----------------------------------------------------------------------------
 # Wilson confidence interval (no scipy required).
 # ----------------------------------------------------------------------------
+
 
 def wilson_ci(k: int, n: int, z: float = 1.96) -> tuple[float, float, float]:
     """Wilson score interval for k passes out of n trials.
@@ -89,16 +90,17 @@ def wilson_ci(k: int, n: int, z: float = 1.96) -> tuple[float, float, float]:
 # Problem templates: indexed difficulty staircase of arithmetic compounds.
 # ----------------------------------------------------------------------------
 
+
 @dataclass
 class Problem:
-    label: str            # short tag identifying the difficulty cell
-    expression: str       # human-readable expression, e.g. "(12345 * 67890) // 234"
-    truth: int            # ground-truth integer answer (computed by parent in Python)
+    label: str  # short tag identifying the difficulty cell
+    expression: str  # human-readable expression, e.g. "(12345 * 67890) // 234"
+    truth: int  # ground-truth integer answer (computed by parent in Python)
 
 
 def _rand_d(rng: random.Random, d: int) -> int:
     """Random d-digit positive integer (no leading zero)."""
-    return rng.randint(10 ** (d - 1), 10 ** d - 1)
+    return rng.randint(10 ** (d - 1), 10**d - 1)
 
 
 def _mul_template(d1: int, d2: int) -> Callable[[random.Random], Problem]:
@@ -109,6 +111,7 @@ def _mul_template(d1: int, d2: int) -> Callable[[random.Random], Problem]:
             expression=f"{a} * {b}",
             truth=a * b,
         )
+
     return gen
 
 
@@ -120,6 +123,7 @@ def _muldiv_template(d1: int, d2: int, d3: int) -> Callable[[random.Random], Pro
             expression=f"floor( ({a} * {b}) / {c} )",
             truth=(a * b) // c,
         )
+
     return gen
 
 
@@ -133,6 +137,7 @@ def _twomul_div_template(d1: int, d2: int, d3: int) -> Callable[[random.Random],
             expression=f"floor( ({a} * {b} + {c} * {d}) / {e} )",
             truth=(a * b + c * d) // e,
         )
+
     return gen
 
 
@@ -146,24 +151,25 @@ def _chained_template(d1: int, d2: int, d3: int) -> Callable[[random.Random], Pr
             expression=f"( floor( ({a} * {b}) / {c} ) + {d} ) * {e}",
             truth=((a * b) // c + d) * e,
         )
+
     return gen
 
 
 def make_difficulty_staircase() -> list[Callable[[random.Random], Problem]]:
     """Ordered list of problem generators, easiest first."""
     return [
-        _mul_template(3, 3),                   # 0: trivial
-        _mul_template(4, 4),                   # 1: easy
-        _mul_template(5, 5),                   # 2
-        _mul_template(5, 7),                   # 3
-        _muldiv_template(5, 7, 4),             # 4: roughly the (15234534*2341234)//23423 regime
-        _muldiv_template(6, 7, 5),             # 5
-        _muldiv_template(7, 7, 5),             # 6
-        _muldiv_template(8, 8, 6),             # 7
-        _twomul_div_template(6, 6, 5),         # 8
-        _twomul_div_template(7, 7, 5),         # 9
-        _chained_template(6, 5, 4),            # 10: very hard
-        _chained_template(7, 5, 4),            # 11
+        _mul_template(3, 3),  # 0: trivial
+        _mul_template(4, 4),  # 1: easy
+        _mul_template(5, 5),  # 2
+        _mul_template(5, 7),  # 3
+        _muldiv_template(5, 7, 4),  # 4: roughly the (15234534*2341234)//23423 regime
+        _muldiv_template(6, 7, 5),  # 5
+        _muldiv_template(7, 7, 5),  # 6
+        _muldiv_template(8, 8, 6),  # 7
+        _twomul_div_template(6, 6, 5),  # 8
+        _twomul_div_template(7, 7, 5),  # 9
+        _chained_template(6, 5, 4),  # 10: very hard
+        _chained_template(7, 5, 4),  # 11
     ]
 
 
@@ -203,6 +209,9 @@ class ProbeResult:
     elapsed_s: float
     conv_path: str
     err_path: str
+    returncode: Optional[int] = None
+    outcome: str = "unknown"
+    policy_violation: bool = False
 
 
 def extract_final_int(conv_path: Path) -> Optional[int]:
@@ -259,9 +268,10 @@ def extract_final_int(conv_path: Path) -> Optional[int]:
 #
 # The fix: each probe writes its own minimal .claude/ into a fresh /tmp dir
 # and runs claude --print with cwd=that-tempdir. The tempdir is auto-deleted
-# on context exit. There is no shared filesystem state between probes, and
-# the experimental contract (no calculator) is enforced by the empty allow
-# list in settings.json regardless of where the script is launched from.
+# on context exit. There is no shared filesystem state between probes.
+# The no-calculator contract is enforced by CLI-level tool restriction,
+# not by permissions.allow. In current Claude Code, permissions.allow
+# auto-allows matching tools; it is not a restrictive allowlist.
 
 MINIMAL_CLAUDE_MD = """# amplify probe — isolated invocation
 
@@ -275,14 +285,112 @@ Rules:
 - Final message: exactly one integer, no commentary, no commas, no units.
 """
 
-# Empty allow list denies ALL tools (Bash, Read, Edit, etc.). The model
-# physically cannot use Python or any other shortcut — it must compute by
-# hand. This is the load-bearing constraint of the experiment.
-MINIMAL_SETTINGS_JSON = json.dumps({
-    "permissions": {"allow": []},
-    "autoMemoryEnabled": False,
-    "hooks": {},
-}, indent=2)
+# Project-local settings are intentionally minimal. The load-bearing
+# no-tool constraint is the CLI's `--tools ""` plus strict MCP config below.
+MINIMAL_SETTINGS_JSON = json.dumps(
+    {
+        "autoMemoryEnabled": False,
+        "hooks": {},
+    },
+    indent=2,
+)
+
+NO_TOOL_CLAUDE_ARGS = [
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--setting-sources",
+    "project",
+    "--disable-slash-commands",
+]
+
+FORBIDDEN_NO_TOOL_NAMES = {
+    "Bash",
+    "WebFetch",
+    "WebSearch",
+    "Task",
+    "Read",
+    "Edit",
+    "Write",
+}
+
+
+def build_no_tool_claude_cmd(
+    prompt: str,
+    model: str,
+    effort: Optional[str] = None,
+    *,
+    session_id: Optional[str] = None,
+    resume_session_id: Optional[str] = None,
+    persist_session: bool = False,
+) -> list[str]:
+    """Build a Claude Code command for a no-tool arithmetic attempt."""
+    cmd = [
+        "claude",
+        "--print",
+        prompt,
+    ]
+    if session_id:
+        cmd += ["--session-id", session_id]
+    if resume_session_id:
+        cmd += ["--resume", resume_session_id]
+    cmd += [
+        "--model",
+        model,
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--max-turns",
+        "30",
+        *NO_TOOL_CLAUDE_ARGS,
+    ]
+    if not persist_session:
+        cmd.append("--no-session-persistence")
+    if effort:
+        cmd += ["--effort", effort]
+    return cmd
+
+
+def trace_policy_violation(conv_path: Path) -> bool:
+    """Return True if a no-tool trace lacks or violates tool metadata."""
+    try:
+        with conv_path.open() as f:
+            for line in f:
+                try:
+                    obj = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if obj.get("type") != "system" or obj.get("subtype") != "init":
+                    continue
+                tools = set(obj.get("tools") or [])
+                has_forbidden_builtin = bool(tools & FORBIDDEN_NO_TOOL_NAMES)
+                has_mcp_tool = any(str(tool).startswith("mcp__") for tool in tools)
+                has_mcp_server = bool(obj.get("mcp_servers") or [])
+                return has_forbidden_builtin or has_mcp_tool or has_mcp_server
+    except FileNotFoundError:
+        return True
+    return True
+
+
+def classify_probe_outcome(
+    *,
+    returncode: Optional[int],
+    reported: Optional[int],
+    truth: int,
+    policy_violation: bool,
+) -> str:
+    """Classify probe outcome without mixing harness failures into p-hat."""
+    if returncode is None:
+        return "cli_not_found"
+    if returncode != 0:
+        return "cli_nonzero"
+    if policy_violation:
+        return "tool_policy_violation"
+    if reported is None:
+        return "malformed"
+    if reported == truth:
+        return "model_correct"
+    return "model_wrong"
 
 
 def probe(
@@ -305,19 +413,10 @@ def probe(
     err_path = traces_dir / f"{probe_id}.stderr.txt"
     prompt = PROMPT_TEMPLATE.format(expression=problem.expression)
 
-    cmd = [
-        "claude",
-        "--print", prompt,
-        "--model", model,
-        "--output-format", "stream-json",
-        "--verbose",
-        "--max-turns", "30",
-        "--permission-mode", "bypassPermissions",
-    ]
-    if effort:
-        cmd += ["--effort", effort]
+    cmd = build_no_tool_claude_cmd(prompt, model, effort)
 
     t0 = time.time()
+    returncode: Optional[int] = None
     try:
         with tempfile.TemporaryDirectory(prefix=f"amplify-probe-{probe_id}-") as tmp:
             tmp_path = Path(tmp)
@@ -327,7 +426,7 @@ def probe(
             (claude_dir / "settings.json").write_text(MINIMAL_SETTINGS_JSON)
 
             with conv_path.open("w") as conv_f, err_path.open("w") as err_f:
-                subprocess.run(
+                proc = subprocess.run(
                     cmd,
                     cwd=str(tmp_path),
                     stdin=subprocess.DEVNULL,
@@ -335,27 +434,53 @@ def probe(
                     stderr=err_f,
                     check=False,
                 )
+                returncode = proc.returncode
     except FileNotFoundError:
         elapsed = time.time() - t0
         return ProbeResult(
-            cell_idx=cell_idx, label=problem.label, expression=problem.expression,
-            truth=problem.truth, reported=None, passed=False, elapsed_s=elapsed,
-            conv_path=str(conv_path), err_path=str(err_path),
+            cell_idx=cell_idx,
+            label=problem.label,
+            expression=problem.expression,
+            truth=problem.truth,
+            reported=None,
+            passed=False,
+            elapsed_s=elapsed,
+            conv_path=str(conv_path),
+            err_path=str(err_path),
+            returncode=None,
+            outcome="cli_not_found",
         )
     elapsed = time.time() - t0
 
     reported = extract_final_int(conv_path)
-    passed = reported is not None and reported == problem.truth
+    policy_violation = trace_policy_violation(conv_path)
+    outcome = classify_probe_outcome(
+        returncode=returncode,
+        reported=reported,
+        truth=problem.truth,
+        policy_violation=policy_violation,
+    )
+    passed = outcome == "model_correct"
     return ProbeResult(
-        cell_idx=cell_idx, label=problem.label, expression=problem.expression,
-        truth=problem.truth, reported=reported, passed=passed, elapsed_s=elapsed,
-        conv_path=str(conv_path), err_path=str(err_path),
+        cell_idx=cell_idx,
+        label=problem.label,
+        expression=problem.expression,
+        truth=problem.truth,
+        reported=reported,
+        passed=passed,
+        elapsed_s=elapsed,
+        conv_path=str(conv_path),
+        err_path=str(err_path),
+        returncode=returncode,
+        outcome=outcome,
+        policy_violation=policy_violation,
     )
 
 
 # ----------------------------------------------------------------------------
 # Search state and acquisition.
 # ----------------------------------------------------------------------------
+
 
 @dataclass
 class CellState:
@@ -418,12 +543,13 @@ class Search:
     p is at the window boundary and burns its budget on a CI that flickers
     in and out of the window forever.
     """
+
     cells: list[CellState]
     target_low: float
     target_high: float
-    max_ci_width: float = 0.20         # CI must be ≤ this wide to call calibrated
-    dwell_patience: int = 40           # max probes at one cell before pivoting
-    initial_batch_min: int = 5         # min trials before considering a cell "characterized"
+    max_ci_width: float = 0.20  # CI must be ≤ this wide to call calibrated
+    dwell_patience: int = 40  # max probes at one cell before pivoting
+    initial_batch_min: int = 5  # min trials before considering a cell "characterized"
     committed_best_idx: Optional[int] = None  # set after triangulation finishes; locks dwelling
 
     def visited(self) -> list[CellState]:
@@ -522,11 +648,12 @@ class Search:
             #   (b) CI is still wider than threshold AND p̂ is too close
             #       to the window edge to ever fit (within edge_safety).
             edge_safety = self.max_ci_width / 4
-            p_at_edge = (p_hat < self.target_low + edge_safety or
-                         p_hat > self.target_high - edge_safety)
+            p_at_edge = (
+                p_hat < self.target_low + edge_safety or p_hat > self.target_high - edge_safety
+            )
             if committed.n >= self.dwell_patience and (
-                not (self.target_low <= p_hat <= self.target_high) or
-                ((ci[2] - ci[0]) > self.max_ci_width and p_at_edge)
+                not (self.target_low <= p_hat <= self.target_high)
+                or ((ci[2] - ci[0]) > self.max_ci_width and p_at_edge)
             ):
                 pivot = self._pick_pivot_neighbor(committed)
                 if pivot is not None:
@@ -541,10 +668,7 @@ class Search:
             return min(partial, key=lambda c: c.n).idx
 
         # 3. In-window candidate exists.
-        in_window = [
-            c for c in characterized
-            if self.target_low <= (c.k / c.n) <= self.target_high
-        ]
+        in_window = [c for c in characterized if self.target_low <= (c.k / c.n) <= self.target_high]
 
         if in_window:
             target_mid = self.target_mid()
@@ -561,13 +685,9 @@ class Search:
                         return adj
 
             # 3b. Re-center across the now-characterized neighborhood.
-            neighborhood = [
-                c for c in characterized
-                if abs(c.idx - best.idx) <= 1
-            ]
+            neighborhood = [c for c in characterized if abs(c.idx - best.idx) <= 1]
             in_window_neighborhood = [
-                c for c in neighborhood
-                if self.target_low <= (c.k / c.n) <= self.target_high
+                c for c in neighborhood if self.target_low <= (c.k / c.n) <= self.target_high
             ]
             if in_window_neighborhood:
                 in_window_neighborhood.sort(
@@ -597,16 +717,18 @@ class Search:
 
         if max_easy is not None and min_hard is None:
             # Need to go harder.
-            unsampled_higher = [c for c in self.cells
-                                if c.idx > max_easy and c.n < self.initial_batch_min]
+            unsampled_higher = [
+                c for c in self.cells if c.idx > max_easy and c.n < self.initial_batch_min
+            ]
             if unsampled_higher:
                 return unsampled_higher[len(unsampled_higher) // 2].idx
             return max(characterized, key=lambda c: c.idx).idx
 
         if min_hard is not None and max_easy is None:
             # Need to go easier.
-            unsampled_lower = [c for c in self.cells
-                               if c.idx < min_hard and c.n < self.initial_batch_min]
+            unsampled_lower = [
+                c for c in self.cells if c.idx < min_hard and c.n < self.initial_batch_min
+            ]
             if unsampled_lower:
                 return unsampled_lower[len(unsampled_lower) // 2].idx
             return min(characterized, key=lambda c: c.idx).idx
@@ -624,7 +746,7 @@ class Search:
 
         # Look at immediate neighbors first, then expand.
         for dist in (1, 2, 3):
-            for direction in ((+1, -1) if prefer_harder else (-1, +1)):
+            for direction in (+1, -1) if prefer_harder else (-1, +1):
                 idx = current.idx + dist * direction
                 if 0 <= idx < len(self.cells):
                     if self.cells[idx].n < self.dwell_patience:
@@ -635,6 +757,7 @@ class Search:
 # ----------------------------------------------------------------------------
 # Main loop.
 # ----------------------------------------------------------------------------
+
 
 def run_calibration(args: argparse.Namespace) -> int:
     rng = random.Random(args.seed)
@@ -664,11 +787,13 @@ def run_calibration(args: argparse.Namespace) -> int:
     class _Tee:
         def __init__(self, *streams):
             self._streams = streams
+
         def write(self, s):
             for stream in self._streams:
                 stream.write(s)
                 stream.flush()
             return len(s)
+
         def flush(self):
             for stream in self._streams:
                 stream.flush()
@@ -679,7 +804,7 @@ def run_calibration(args: argparse.Namespace) -> int:
     _original_stderr = sys.stderr
     sys.stderr = _Tee(_original_stderr, progress_log_file)
 
-    print(f"=== amplify calibration search ===", file=sys.stderr)
+    print("=== amplify calibration search ===", file=sys.stderr)
     print(f"  model:        {args.model}", file=sys.stderr)
     print(f"  effort:       {args.effort or '(CLI default)'}", file=sys.stderr)
     print(f"  target:       p ∈ [{args.target_low}, {args.target_high}]", file=sys.stderr)
@@ -697,12 +822,17 @@ def run_calibration(args: argparse.Namespace) -> int:
     while total_probes < args.budget:
         # Check stop condition first.
         calibrated = search.find_calibrated()
-        if calibrated is not None and (calibrated.ci()[2] - calibrated.ci()[0]) <= args.max_ci_width:
+        if (
+            calibrated is not None
+            and (calibrated.ci()[2] - calibrated.ci()[0]) <= args.max_ci_width
+        ):
             break
 
         next_idx = search.pick_next()
         if next_idx is None:
-            print("[search] staircase doesn't bracket the target window — giving up.", file=sys.stderr)
+            print(
+                "[search] staircase doesn't bracket the target window — giving up.", file=sys.stderr
+            )
             break
 
         # Decide batch size for this iteration.
@@ -711,9 +841,12 @@ def run_calibration(args: argparse.Namespace) -> int:
         # Build the batch — same cell, fresh problems each.
         cell = cells[next_idx]
         cell_status = cell.status(search.target_low, search.target_high)
-        print(f"[search] probing cell {next_idx} ({templates[next_idx](random.Random(0)).label}, "
-              f"current n={cell.n}, k={cell.k}, status={cell_status}) "
-              f"with batch of {batch_size}", file=sys.stderr)
+        print(
+            f"[search] probing cell {next_idx} ({templates[next_idx](random.Random(0)).label}, "
+            f"current n={cell.n}, k={cell.k}, status={cell_status}) "
+            f"with batch of {batch_size}",
+            file=sys.stderr,
+        )
 
         with ThreadPoolExecutor(max_workers=batch_size) as ex:
             futures = []
@@ -723,21 +856,31 @@ def run_calibration(args: argparse.Namespace) -> int:
                 # Each probe gets its own RNG instance to ensure parallel-safe
                 # problem generation.
                 child_rng = random.Random(rng.randrange(1 << 30))
-                futures.append(ex.submit(
-                    probe, next_idx, templates[next_idx], child_rng,
-                    args.model, run_dir, probe_id, args.effort,
-                ))
+                futures.append(
+                    ex.submit(
+                        probe,
+                        next_idx,
+                        templates[next_idx],
+                        child_rng,
+                        args.model,
+                        run_dir,
+                        probe_id,
+                        args.effort,
+                    )
+                )
             for fut in as_completed(futures):
                 result = fut.result()
                 cell.update(result)
                 total_probes += 1
                 lo, ph, hi = cell.ci()
                 marker = "✓" if result.passed else "✗"
-                print(f"  {marker} cell {next_idx} {result.label}  "
-                      f"truth={result.truth}  reported={result.reported}  "
-                      f"({result.elapsed_s:.1f}s)  → cell n={cell.n} k={cell.k} "
-                      f"p̂={ph:.3f} CI=[{lo:.3f},{hi:.3f}]",
-                      file=sys.stderr)
+                print(
+                    f"  {marker} cell {next_idx} {result.label}  "
+                    f"truth={result.truth}  reported={result.reported}  "
+                    f"({result.elapsed_s:.1f}s)  → cell n={cell.n} k={cell.k} "
+                    f"p̂={ph:.3f} CI=[{lo:.3f},{hi:.3f}]",
+                    file=sys.stderr,
+                )
 
     elapsed_total = time.time() - t_start
 
@@ -751,15 +894,23 @@ def run_calibration(args: argparse.Namespace) -> int:
     print(f"  wall clock:     {elapsed_total:.1f}s", file=sys.stderr)
     print(f"  cells visited:  {len(visited)}", file=sys.stderr)
     print("", file=sys.stderr)
-    print(f"  {'cell':<6} {'label':<22} {'n':>4} {'k':>4} {'p̂':>8} {'CI low':>8} {'CI high':>8}  status", file=sys.stderr)
-    print(f"  {'----':<6} {'-----':<22} {'-':>4} {'-':>4} {'--':>8} {'------':>8} {'-------':>8}  ------", file=sys.stderr)
+    print(
+        f"  {'cell':<6} {'label':<22} {'n':>4} {'k':>4} {'p̂':>8} {'CI low':>8} {'CI high':>8}  status",
+        file=sys.stderr,
+    )
+    print(
+        f"  {'----':<6} {'-----':<22} {'-':>4} {'-':>4} {'--':>8} {'------':>8} {'-------':>8}  ------",
+        file=sys.stderr,
+    )
     for c in visited:
         lo, ph, hi = c.ci()
         # Pull a label sample from the template.
         label = templates[c.idx](random.Random(0)).label
         st = c.status(search.target_low, search.target_high)
-        print(f"  {c.idx:<6} {label:<22} {c.n:>4} {c.k:>4} {ph:>8.3f} {lo:>8.3f} {hi:>8.3f}  {st}",
-              file=sys.stderr)
+        print(
+            f"  {c.idx:<6} {label:<22} {c.n:>4} {c.k:>4} {ph:>8.3f} {lo:>8.3f} {hi:>8.3f}  {st}",
+            file=sys.stderr,
+        )
     print("", file=sys.stderr)
 
     if calibrated is not None:
@@ -798,6 +949,9 @@ def run_calibration(args: argparse.Namespace) -> int:
                         "reported": h.reported,
                         "passed": h.passed,
                         "elapsed_s": h.elapsed_s,
+                        "returncode": h.returncode,
+                        "outcome": h.outcome,
+                        "policy_violation": h.policy_violation,
                     }
                     for h in c.history
                 ],
@@ -821,16 +975,33 @@ def run_calibration(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--model", default="claude-haiku-4-5-20251001", help="Claude model to calibrate")
-    parser.add_argument("--target-low", type=float, default=0.60, help="Lower edge of target p window")
-    parser.add_argument("--target-high", type=float, default=0.90, help="Upper edge of target p window")
-    parser.add_argument("--max-ci-width", type=float, default=0.25, help="CI width required to declare a cell calibrated")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--model", default="claude-haiku-4-5-20251001", help="Claude model to calibrate"
+    )
+    parser.add_argument(
+        "--target-low", type=float, default=0.60, help="Lower edge of target p window"
+    )
+    parser.add_argument(
+        "--target-high", type=float, default=0.90, help="Upper edge of target p window"
+    )
+    parser.add_argument(
+        "--max-ci-width",
+        type=float,
+        default=0.25,
+        help="CI width required to declare a cell calibrated",
+    )
     parser.add_argument("--budget", type=int, default=120, help="Maximum total probes (cost cap)")
     parser.add_argument("--parallel", type=int, default=5, help="Parallel probes per batch")
     parser.add_argument("--seed", type=int, default=42, help="RNG seed for reproducibility")
-    parser.add_argument("--effort", default=None, choices=[None, "low", "medium", "high", "max"],
-                        help="claude --effort level (low/medium/high/max). Default: omit flag (CLI default).")
+    parser.add_argument(
+        "--effort",
+        default=None,
+        choices=[None, "low", "medium", "high", "max"],
+        help="claude --effort level (low/medium/high/max). Default: omit flag (CLI default).",
+    )
     args = parser.parse_args(argv[1:])
 
     return run_calibration(args)
