@@ -14,7 +14,7 @@
 #   pixi run orchestrator-run -- 5 --fresh    # 5 trials, wipe traces/ first
 #   pixi run orchestrator-run -- 5 --resume   # 5 trials, skip complete traces
 
-set -uo pipefail
+set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 INPUTS_FILE="$ROOT/inputs/inputs.json"

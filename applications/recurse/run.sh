@@ -19,7 +19,7 @@
 #      the instance to attempt.
 #   5. Captures the parent's stream-json conversation log.
 
-set -uo pipefail
+set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT" || exit 1

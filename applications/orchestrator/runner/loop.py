@@ -203,10 +203,8 @@ def invoke_claude_isolated(
             sys.exit(2)
 
         if proc.returncode != 0:
-            print(
-                f"WARNING: claude exited {proc.returncode} for {trial_id}.{label}; "
-                f"see {stderr_file}",
-                file=sys.stderr,
+            raise RuntimeError(
+                f"claude exited {proc.returncode} for {trial_id}.{label}; see {stderr_file}"
             )
 
         # Read back the conversation log to extract the final assistant text.

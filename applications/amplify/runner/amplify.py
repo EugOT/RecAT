@@ -139,6 +139,13 @@ def trial_outcome(answers: list[Optional[int]], n: int, truth: int) -> bool:
     return vote is not None and vote == truth
 
 
+def planned_invocation_counts(m: int, max_n: int, skip_non_isolated: bool) -> tuple[int, int]:
+    """Return planned Claude invocations for isolated and non-isolated arms."""
+    isolated = m * max_n
+    non_isolated = 0 if skip_non_isolated else m * max_n
+    return isolated, non_isolated
+
+
 # ----------------------------------------------------------------------------
 # Isolated arm
 # ----------------------------------------------------------------------------
@@ -503,8 +510,7 @@ def run_amplify(args: argparse.Namespace) -> int:
     print(f"  max_n:        {max_n}", file=sys.stderr)
     print(f"  parallel:     {args.parallel}", file=sys.stderr)
     print(f"  traces:       {run_dir}", file=sys.stderr)
-    iso_invs = args.m * max_n
-    nis_invs = 0 if args.skip_non_isolated else args.m * len(n_values)
+    iso_invs, nis_invs = planned_invocation_counts(args.m, max_n, args.skip_non_isolated)
     if args.skip_non_isolated:
         print(
             f"  invocations:  isolated={iso_invs}, non-isolated=SKIPPED, total={iso_invs}",
