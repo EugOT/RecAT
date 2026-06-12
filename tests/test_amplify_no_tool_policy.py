@@ -79,6 +79,13 @@ def test_trace_policy_violation_fails_closed_without_init(tmp_path: Path) -> Non
     assert calibrate.trace_policy_violation(trace)
 
 
+def test_trace_policy_violation_fails_closed_on_partial_init(tmp_path: Path) -> None:
+    trace = tmp_path / "trace.jsonl"
+    trace.write_text(json.dumps({"type": "system", "subtype": "init", "tools": []}) + "\n")
+
+    assert calibrate.trace_policy_violation(trace)
+
+
 def test_probe_outcome_taxonomy_separates_harness_failures() -> None:
     assert (
         calibrate.classify_probe_outcome(

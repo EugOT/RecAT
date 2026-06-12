@@ -248,9 +248,9 @@ def main() -> int:
     bad[3]["event"] = "totally_made_up"
     ok &= expect_fail("unknown event type", bad, "unknown event type")
 
-    # 6. Test_index reordered (out of order).
+    # 6. Test_index out of range.
     bad = copy.deepcopy(base)
-    # Find first round_start, swap the first two student_invokes.
+    # Corrupt the first round's first student invocation.
     for ev in bad:
         if ev["event"] == "student_invoke" and ev["data"]["round"] == 1:
             ev["data"]["test_index"] = 5  # garbage

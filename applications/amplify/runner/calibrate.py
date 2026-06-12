@@ -369,10 +369,16 @@ def trace_policy_violation(conv_path: Path) -> bool:
                     continue
                 if obj.get("type") != "system" or obj.get("subtype") != "init":
                     continue
-                tools = set(obj.get("tools") or [])
+                if "tools" not in obj or "mcp_servers" not in obj:
+                    return True
+                tools_raw = obj["tools"]
+                mcp_servers_raw = obj["mcp_servers"]
+                if not isinstance(tools_raw, list) or not isinstance(mcp_servers_raw, list):
+                    return True
+                tools = set(tools_raw)
                 has_forbidden_builtin = bool(tools & FORBIDDEN_NO_TOOL_NAMES)
                 has_mcp_tool = any(str(tool).startswith("mcp__") for tool in tools)
-                has_mcp_server = bool(obj.get("mcp_servers") or [])
+                has_mcp_server = bool(mcp_servers_raw)
                 return has_forbidden_builtin or has_mcp_tool or has_mcp_server
     except FileNotFoundError:
         return True
